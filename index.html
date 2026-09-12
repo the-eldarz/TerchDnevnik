@@ -430,7 +430,7 @@ const DEFAULT_SCHEDULE = [
     {id:'fri6', time:'13:15–14:00', subject:'Учебный курс по русс. языку'},
     {id:'fri7', time:'14:05–14:50', subject:'Каб. язык'}
   ],
-  [ // СБ — новое расписание
+  [ // СБ
     {id:'sat1', time:'08:30–09:15', subject:'Информатика'},
     {id:'sat2', time:'09:25–10:10', subject:'Алгебра'},
     {id:'sat3', time:'10:20–11:05', subject:'ОБЗР'},
@@ -955,6 +955,7 @@ function updateAdminUI(){
 
 adminBtn.onclick = openSettings;
 
+/* ======================= НАСТРОЙКИ ======================= */
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
@@ -987,10 +988,7 @@ function openSettings(){
         (isAdmin
           ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div>' +
             '<button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>'
-          : '<label>Пароль' +
-              '<input id="set-pass" type="password" inputmode="numeric" placeholder="••••••" autocomplete="off">' +
-            '</label>' +
-            '<button class="btn primary" data-act="login" style="width:100%">Войти как администратор</button>'
+          : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>'
         ) +
       '</div>' +
 
@@ -1023,21 +1021,9 @@ function openSettings(){
     const act = ev.target.dataset ? ev.target.dataset.act : null;
     if (ev.target === back || act === 'cancel'){ back.remove(); return; }
 
-    if (act === 'login'){
-      const inp = back.querySelector('#set-pass');
-      if (!inp) return;
-      if (inp.value === ADMIN_PASS){
-        isAdmin = true;
-        store.set('admin', true);
-        updateAdminUI();
-        back.remove();
-        openSettings();
-        render();
-      } else {
-        alert('Неверный пароль');
-        inp.value = '';
-        inp.focus();
-      }
+    if (act === 'openLogin'){
+      back.remove();
+      openAdminLogin();
       return;
     }
 
@@ -1047,16 +1033,63 @@ function openSettings(){
       store.set('admin', false);
       updateAdminUI();
       back.remove();
-      openSettings();
       render();
       return;
     }
   });
-
-  const inp = back.querySelector('#set-pass');
-  if (inp) setTimeout(() => inp.focus(), 120);
 }
 
+/* ==================== ОКНО ВХОДА АДМИНА ==================== */
+function openAdminLogin(){
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.innerHTML =
+    '<div class="modal">' +
+      '<div class="modal-title">Вход в профиль администратора</div>' +
+      '<label>Введите пароль' +
+        '<input id="login-pass" type="password" inputmode="numeric" placeholder="••••••" autocomplete="off">' +
+      '</label>' +
+      '<div class="modal-actions">' +
+        '<button class="btn ghost" data-act="cancel">Отмена</button>' +
+        '<button class="btn primary" data-act="login">Войти</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(back);
+
+  const inp = back.querySelector('#login-pass');
+
+  /* автофокус и Enter только здесь — в окне пароля */
+  setTimeout(() => inp.focus(), 100);
+
+  inp.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') tryLogin();
+  });
+
+  function tryLogin(){
+    const val = inp.value;
+    if (val === ADMIN_PASS){
+      isAdmin = true;
+      store.set('admin', true);
+      updateAdminUI();
+      back.remove();
+      openSettings();
+      render();
+    } else {
+      alert('Неверный пароль');
+      inp.value = '';
+      inp.focus();
+    }
+  }
+
+  back.addEventListener('click', ev => {
+    const act = ev.target.dataset ? ev.target.dataset.act : null;
+    if (ev.target === back || act === 'cancel'){ back.remove(); return; }
+    if (act === 'login'){ tryLogin(); }
+  });
+}
+
+/* ==================== РЕДАКТОР ЗАНЯТИЯ ==================== */
 function openEditor(lessonId){
   const di = dowIndex(state.date);
   if (!schedule[di]) schedule[di] = [];
