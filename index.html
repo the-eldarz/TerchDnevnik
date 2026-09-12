@@ -544,7 +544,6 @@ async function loadHomeworkFromServer(){
     const record = data && data.record;
 
     if (record && typeof record === 'object' && !Array.isArray(record)){
-      // Чистим тестовый ключ, если остался от создания bin
       if (Object.keys(record).length === 1 && record.test !== undefined){
         homework = {};
       } else {
@@ -630,4 +629,734 @@ function displaySubject(raw){
 
 function getRoom(lesson, dow){
   if (lesson.room && lesson.room.trim()) return lesson.room.trim();
-  const s
+  const s = (lesson.subject || '').trim().toLowerCase();
+  for (const r of RULES){
+    for (const k of r.keys){
+      if (s.includes(k)){
+        if (r.roomByDow && dow != null && r.roomByDow[dow] != null){
+          return r.roomByDow[dow];
+        }
+        return r.room || '';
+      }
+    }
+  }
+  return '';
+}
+
+function getTeacher(lesson){
+  if (lesson.teacher && lesson.teacher.trim()) return lesson.teacher.trim();
+  const s = (lesson.subject || '').trim().toLowerCase();
+  for (const r of RULES){
+    for (const k of r.keys){
+      if (s.includes(k)) return r.teacher || '';
+    }
+  }
+  return '';
+}
+
+const state = { view:'day', date:new Date(), expandedId:null };
+
+function render(opts){
+  opts = opts || {};
+  updateNavLabel();
+  if (state.view === 'day')        renderDay();
+  else if (state.view === 'week')  renderWeek();
+  else                             renderMonth();
+
+  if (!opts.skipFade){
+    content.classList.remove('anim');
+    void content.offsetWidth;
+    content.classList.add('anim');
+  } else {
+    content.classList.remove('anim');
+  }
+}
+
+function updateNavLabel(){
+  const d = state.date;
+  if (state.view === 'day'){
+    navLabel.textContent = d.getDate() + ' ' + MONTHS_GEN[d.getMonth()] + ' ' + d.getFullYear();
+  } else if (state.view === 'week'){
+    const di  = dowIndex(d);
+    const mon = addDays(d, -di);
+    const sun = addDays(d, 6 - di);
+    if (mon.getMonth() === sun.getMonth()){
+      navLabel.textContent = mon.getDate() + ' – ' + sun.getDate() + ' ' + MONTHS_GEN[mon.getMonth()];
+    } else {
+      navLabel.textContent = mon.getDate() + ' ' + MONTHS_GEN[mon.getMonth()] +
+                             ' – ' + sun.getDate() + ' ' + MONTHS_GEN[sun.getMonth()];
+    }
+  } else {
+    navLabel.textContent = MONTHS_NOM[d.getMonth()] + ' ' + d.getFullYear();
+  }
+}
+
+function renderDay(){
+  const d   = state.date;
+  const di  = dowIndex(d);
+  const ds  = ymd(d);
+  const lessons = sortLessons(schedule[di] || []);
+  const hw  = homework[ds] || {};
+
+  let html = '<div class="day-head">' +
+    '<div class="dow">' + DOW_FULL[di] + (isToday(d) ? '<span class="badge-today">сегодня</span>' : '') + '</div>' +
+    '<div class="date">' + d.getDate() + ' ' + MONTHS_GEN[d.getMonth()] + ' ' + d.getFullYear() + '</div>' +
+  '</div>';
+
+  if (!lessons.length){
+    html += '<div class="empty"><span class="big">🎉</span>Занятий нет</div>';
+  } else {
+    html += '<div class="lessons">';
+    lessons.forEach((l, i) => {
+      const hwText   = hw[l.id] || '';
+      const room     = getRoom(l, di);
+      const teacher  = getTeacher(l);
+      const expanded = state.expandedId === l.id;
+
+      let hwBlock;
+      if (isAdmin){
+        hwBlock =
+          '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' +
+            esc(hwText) +
+          '</textarea>' +
+          '<div class="hw-actions">' +
+            '<button class="save-hw" data-save="' + esc(l.id) + '">Сохранить ДЗ</button>' +
+            (hwText
+              ? '<button class="delete-hw" data-delete-hw="' + esc(l.id) + '">Удалить ДЗ</button>'
+              : ''
+            ) +
+          '</div>';
+      } else {
+        hwBlock = hwText
+          ? '<div class="hw-display">' + esc(hwText) + '</div>'
+          : '<div class="no-hw">Домашнее задание не задано</div>';
+      }
+
+      html +=
+        '<div class="lesson' +
+          (hwText ? ' has-hw' : '') +
+          (expanded ? ' expanded' : '') +
+        '" data-lesson="' + esc(l.id) + '">' +
+          '<div class="lesson-row">' +
+            '<div class="time-col">' +
+              '<div class="time">' + esc(l.time) + '</div>' +
+              '<div class="num">' + (i+1) + '</div>' +
+            '</div>' +
+            '<div class="info">' +
+              '<div class="subject">' + esc(displaySubject(l.subject)) + '</div>' +
+            '</div>' +
+            '<div class="chev">›</div>' +
+          '</div>' +
+          '<div class="details">' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Преподаватель</div>' +
+              (teacher
+                ? '<div class="detail-value teacher">' + esc(teacher) + '</div>'
+                : '<div class="no-teacher">не указан</div>'
+              ) +
+            '</div>' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Кабинет</div>' +
+              '<div class="detail-value room">' +
+                (room ? (room === 'Спортзал' ? esc(room) : 'каб. ' + esc(room)) : 'не указан') +
+              '</div>' +
+            '</div>' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Домашнее задание</div>' +
+              hwBlock +
+            '</div>' +
+            (isAdmin
+              ? '<button class="btn-edit-lesson" data-edit="' + esc(l.id) + '">Изменить занятие</button>'
+              : '') +
+          '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (isAdmin){
+    html += '<button class="add-btn" id="addLesson">+ Добавить занятие</button>';
+    html += '<div class="hint">Нажмите на занятие, чтобы развернуть данные.<br>' +
+            'В развёрнутом виде админ может сохранить, удалить ДЗ и изменить занятие.</div>';
+  } else {
+    html += '<div class="hint">Нажмите на занятие, чтобы увидеть преподавателя, кабинет и домашнее задание.</div>';
+  }
+
+  content.innerHTML = html;
+}
+
+function renderWeek(){
+  const di  = dowIndex(state.date);
+  const mon = addDays(state.date, -di);
+
+  let html = '<div class="week-view">';
+  for (let i = 0; i < 7; i++){
+    const date = addDays(mon, i);
+    const ds   = ymd(date);
+    const lessons = sortLessons(schedule[i] || []);
+    const hw   = homework[ds] || {};
+
+    html += '<div class="week-day' + (isToday(date) ? ' today' : '') + '" data-date="' + ds + '">' +
+      '<div class="wd-head">' +
+        '<span class="wd-name">' + DOW_SHORT[i] + '</span>' +
+        '<span class="wd-date">' + date.getDate() + '.' + String(date.getMonth()+1).padStart(2,'0') + '</span>' +
+      '</div>';
+
+    if (lessons.length){
+      lessons.forEach(l => {
+        html += '<div class="wd-lesson">' +
+          '<b>' + esc(l.time) + '</b>' +
+          '<span class="sub">' + esc(displaySubject(l.subject)) + '</span>' +
+          (hw[l.id] ? '<span class="mark">📝</span>' : '') +
+        '</div>';
+      });
+    } else {
+      html += '<span class="wd-empty">нет занятий</span>';
+    }
+
+    html += '</div>';
+  }
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+function renderMonth(){
+  const d     = state.date;
+  const year  = d.getFullYear();
+  const month = d.getMonth();
+  const first = new Date(year, month, 1);
+  const startDow = dowIndex(first);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr = ymd(new Date());
+  const selStr   = ymd(state.date);
+
+  let html = '<div class="weekdays">' + DOW_SHORT.map(x => '<div>' + x + '</div>').join('') + '</div>';
+  html += '<div class="grid">';
+
+  for (let i = 0; i < startDow; i++) html += '<div class="cell empty"></div>';
+
+  for (let day = 1; day <= daysInMonth; day++){
+    const date = new Date(year, month, day);
+    const ds   = ymd(date);
+    const di   = dowIndex(date);
+    const hasLessons = (schedule[di] || []).length > 0;
+    const hwObj = homework[ds] || {};
+    const hasHw = Object.keys(hwObj).some(k => hwObj[k] && hwObj[k].trim());
+
+    html += '<div class="cell' +
+      (ds === todayStr ? ' today' : '') +
+      (ds === selStr ? ' sel' : '') +
+      '" data-date="' + ds + '">' +
+        '<div class="dnum">' + day + '</div>' +
+        '<div class="dots">' +
+          (hasLessons ? '<span class="dot lesson-dot"></span>' : '') +
+          (hasHw ? '<span class="dot hw-dot"></span>' : '') +
+        '</div>' +
+      '</div>';
+  }
+
+  html += '</div>';
+  html += '<div class="legend">' +
+    '<span><span class="dot lesson-dot"></span>занятия</span>' +
+    '<span><span class="dot hw-dot"></span>есть ДЗ</span>' +
+  '</div>';
+
+  content.innerHTML = html;
+}
+
+let animating = false;
+
+function applyShift(delta){
+  state.expandedId = null;
+  if (state.view === 'day'){
+    state.date = addDays(state.date, delta);
+  } else if (state.view === 'week'){
+    state.date = addDays(state.date, delta * 7);
+  } else {
+    const x = new Date(state.date);
+    x.setDate(1);
+    x.setMonth(x.getMonth() + delta);
+    state.date = x;
+  }
+}
+
+function shiftNoAnim(delta){
+  if (animating) return;
+  applyShift(delta);
+  render();
+  main.scrollTop = 0;
+}
+
+$('prevBtn').onclick = () => shiftNoAnim(-1);
+$('nextBtn').onclick = () => shiftNoAnim(1);
+$('todayBtn').onclick = () => {
+  if (animating) return;
+  state.date = new Date();
+  state.expandedId = null;
+  render();
+  main.scrollTop = 0;
+};
+
+document.querySelectorAll('.bottom button').forEach(btn => {
+  btn.onclick = () => {
+    if (animating) return;
+    state.view = btn.dataset.view;
+    state.expandedId = null;
+    document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b === btn));
+    render();
+    main.scrollTop = 0;
+  };
+});
+
+let startX = 0, startY = 0, curDx = 0;
+let dragging = false, dirLocked = null;
+
+main.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  if (animating) return;
+  if (document.querySelector('.modal-back')) return;
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  curDx  = 0;
+  dragging = false;
+  dirLocked = null;
+}, {passive:true});
+
+main.addEventListener('touchmove', e => {
+  if (animating) return;
+  if (e.touches.length !== 1) return;
+  const dx = e.touches[0].clientX - startX;
+  const dy = e.touches[0].clientY - startY;
+
+  if (dirLocked === null){
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    if (Math.abs(dx) > Math.abs(dy) * 1.3) dirLocked = 'h';
+    else dirLocked = 'v';
+  }
+  if (dirLocked === 'v') return;
+
+  if (e.cancelable) e.preventDefault();
+  dragging = true;
+  curDx = dx;
+
+  const w = window.innerWidth;
+  const damp = dx * (1 - Math.min(0.55, Math.abs(dx) / (w * 1.4)));
+  content.style.transition = 'none';
+  content.style.transform = 'translateX(' + damp + 'px)';
+  content.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / (w * 1.2)));
+}, {passive:false});
+
+main.addEventListener('touchend', e => {
+  if (!dragging) return;
+  dragging = false;
+  const dx = curDx;
+  const w  = window.innerWidth;
+  const threshold = Math.max(60, w * 0.18);
+
+  if (Math.abs(dx) > threshold){
+    finishSwipe(dx < 0 ? 1 : -1);
+  } else {
+    content.style.transition = 'transform .22s cubic-bezier(.2,.9,.3,1), opacity .22s ease-out';
+    content.style.transform = 'translateX(0)';
+    content.style.opacity = '1';
+    setTimeout(() => {
+      content.style.transition = '';
+      content.style.transform = '';
+      content.style.opacity = '';
+    }, 240);
+  }
+}, {passive:true});
+
+function finishSwipe(direction){
+  animating = true;
+  const w = window.innerWidth;
+
+  content.style.transition = 'transform .18s ease-out, opacity .18s ease-out';
+  content.style.transform = 'translateX(' + (direction > 0 ? -w * 0.55 : w * 0.55) + 'px)';
+  content.style.opacity = '0';
+
+  setTimeout(() => {
+    applyShift(direction);
+    render({skipFade:true});
+    main.scrollTop = 0;
+
+    content.style.transition = 'none';
+    content.style.transform = 'translateX(' + (direction > 0 ? w * 0.5 : -w * 0.5) + 'px)';
+    content.style.opacity = '0';
+    void content.offsetWidth;
+
+    content.style.transition = 'transform .24s cubic-bezier(.2,.9,.3,1), opacity .24s ease-out';
+    content.style.transform = 'translateX(0)';
+    content.style.opacity = '1';
+
+    setTimeout(() => {
+      content.style.transition = '';
+      content.style.transform = '';
+      content.style.opacity = '';
+      animating = false;
+    }, 260);
+  }, 190);
+}
+
+document.addEventListener('keydown', e => {
+  if (document.querySelector('.modal-back')) return;
+  if (e.key === 'ArrowLeft')  shiftNoAnim(-1);
+  if (e.key === 'ArrowRight') shiftNoAnim(1);
+});
+
+content.addEventListener('click', async e => {
+
+  const saveBtn = e.target.closest('[data-save]');
+  if (saveBtn && isAdmin){
+    const lessonId = saveBtn.dataset.save;
+    const ta = content.querySelector('[data-hw-for="' + lessonId + '"]');
+    if (ta){
+      const ds  = ymd(state.date);
+      const val = ta.value.trim();
+
+      if (!homework[ds]) homework[ds] = {};
+      if (val) homework[ds][lessonId] = val;
+      else     delete homework[ds][lessonId];
+      if (!Object.keys(homework[ds]).length) delete homework[ds];
+      store.set('homework', homework);
+      render({skipFade:true});
+
+      const ok = await saveHomeworkToServer();
+      if (!ok) alert('Не удалось сохранить в облако. Проверь интернет.');
+    }
+    return;
+  }
+
+  const delHw = e.target.closest('[data-delete-hw]');
+  if (delHw && isAdmin){
+    const lessonId = delHw.dataset.deleteHw;
+    if (!confirm('Удалить домашнее задание для этого занятия?')) return;
+    const ds = ymd(state.date);
+    if (homework[ds]){
+      delete homework[ds][lessonId];
+      if (!Object.keys(homework[ds]).length) delete homework[ds];
+    }
+    store.set('homework', homework);
+    render({skipFade:true});
+
+    const ok = await saveHomeworkToServer();
+    if (!ok) alert('Не удалось сохранить в облако.');
+    return;
+  }
+
+  const editBtn = e.target.closest('[data-edit]');
+  if (editBtn && isAdmin){
+    openEditor(editBtn.dataset.edit);
+    return;
+  }
+
+  if (e.target.id === 'addLesson'){
+    openEditor(null);
+    return;
+  }
+
+  const lessonEl = e.target.closest('[data-lesson]');
+  if (lessonEl){
+    if (e.target.closest('textarea') || e.target.closest('button')) return;
+    const id = lessonEl.dataset.lesson;
+    state.expandedId = (state.expandedId === id) ? null : id;
+    render({skipFade:true});
+    return;
+  }
+
+  const dayCell = e.target.closest('[data-date]');
+  if (dayCell && state.view !== 'day'){
+    state.date = parseYmd(dayCell.dataset.date);
+    state.view = 'day';
+    state.expandedId = null;
+    document.querySelectorAll('.bottom button').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === 'day'));
+    render();
+    main.scrollTop = 0;
+  }
+});
+
+function updateAdminUI(){
+  adminBtn.classList.toggle('on', isAdmin);
+}
+
+adminBtn.onclick = openSettings;
+
+function openSettings(){
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.innerHTML =
+    '<div class="modal">' +
+      '<div class="modal-title">Настройки</div>' +
+      '<div class="settings-section">' +
+        '<div class="settings-label">Тема оформления</div>' +
+        '<div class="theme-toggle">' +
+          '<button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button>' +
+          '<button class="theme-opt' + (currentTheme === 'dark'  ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-section">' +
+        '<div class="settings-label">Названия предметов</div>' +
+        '<div class="theme-toggle">' +
+          '<button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button>' +
+          '<button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button>' +
+        '</div>' +
+        '<div class="settings-hint">' +
+          'Короткие: «Общество», «Англ. яз.», «Русс. яз.», «Каб. яз.».<br>' +
+          'Полные: «Обществознание», «Английский язык», «Русский язык», «Кабардинский язык».' +
+        '</div>' +
+      '</div>' +
+      '<div class="settings-section">' +
+        '<div class="settings-label">Профиль администратора</div>' +
+        (isAdmin
+          ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div>' +
+            '<button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>'
+          : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>'
+        ) +
+      '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn ghost" data-act="cancel">Закрыть</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(back);
+
+  back.addEventListener('click', ev => {
+    const themeBtn = ev.target.closest('[data-theme-set]');
+    if (themeBtn){
+      applyTheme(themeBtn.dataset.themeSet);
+      back.querySelectorAll('[data-theme-set]').forEach(b =>
+        b.classList.toggle('active', b.dataset.themeSet === currentTheme));
+      return;
+    }
+
+    const shortBtn = ev.target.closest('[data-short]');
+    if (shortBtn){
+      shortNames = shortBtn.dataset.short === '1';
+      store.set('shortNames', shortNames);
+      back.querySelectorAll('[data-short]').forEach(b =>
+        b.classList.toggle('active', (b.dataset.short === '1') === shortNames));
+      render({skipFade:true});
+      return;
+    }
+
+    const act = ev.target.dataset ? ev.target.dataset.act : null;
+    if (ev.target === back || act === 'cancel'){ back.remove(); return; }
+
+    if (act === 'openLogin'){
+      back.remove();
+      openAdminLogin();
+      return;
+    }
+
+    if (act === 'logout'){
+      if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return;
+      isAdmin = false;
+      store.set('admin', false);
+      updateAdminUI();
+      back.remove();
+      render();
+      return;
+    }
+  });
+}
+
+function openAdminLogin(){
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.innerHTML =
+    '<div class="modal">' +
+      '<div class="modal-title">Вход в профиль администратора</div>' +
+      '<label>Введите пароль' +
+        '<input id="login-pass" type="password" inputmode="numeric" placeholder="••••••" autocomplete="off">' +
+      '</label>' +
+      '<div class="modal-actions">' +
+        '<button class="btn ghost" data-act="cancel">Отмена</button>' +
+        '<button class="btn primary" data-act="login">Войти</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(back);
+  const inp = back.querySelector('#login-pass');
+  setTimeout(() => inp.focus(), 100);
+
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') tryLogin(); });
+
+  function tryLogin(){
+    if (inp.value === ADMIN_PASS){
+      isAdmin = true;
+      store.set('admin', true);
+      updateAdminUI();
+      back.remove();
+      openSettings();
+      render();
+    } else {
+      alert('Неверный пароль');
+      inp.value = '';
+      inp.focus();
+    }
+  }
+
+  back.addEventListener('click', ev => {
+    const act = ev.target.dataset ? ev.target.dataset.act : null;
+    if (ev.target === back || act === 'cancel'){ back.remove(); return; }
+    if (act === 'login'){ tryLogin(); }
+  });
+}
+
+function openEditor(lessonId){
+  const di = dowIndex(state.date);
+  if (!schedule[di]) schedule[di] = [];
+
+  const lesson = lessonId ? schedule[di].find(l => l.id === lessonId) : null;
+
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.innerHTML =
+    '<div class="modal">' +
+      '<div class="modal-title">' + (lesson ? 'Изменить занятие' : 'Новое занятие') + '</div>' +
+      '<label>Время (например 08:30–09:15)' +
+        '<input id="f-time" type="text" value="' + (lesson ? esc(lesson.time) : '08:30–09:15') + '">' +
+      '</label>' +
+      '<label>Предмет' +
+        '<input id="f-subject" type="text" placeholder="Математика" value="' + (lesson ? esc(lesson.subject) : '') + '">' +
+      '</label>' +
+      '<label>Преподаватель (пусто = подставится по предмету)' +
+        '<input id="f-teacher" type="text" placeholder="Иванов Иван Иванович" value="' + (lesson ? esc(lesson.teacher || '') : '') + '">' +
+      '</label>' +
+      '<label>Кабинет (пусто = подставится по предмету)' +
+        '<input id="f-room" type="text" placeholder="например 15" value="' + (lesson ? esc(lesson.room || '') : '') + '">' +
+      '</label>' +
+      '<div class="modal-actions">' +
+        '<button class="btn ghost" data-act="cancel">Отмена</button>' +
+        (lesson ? '<button class="btn danger" data-act="delete">Удалить</button>' : '') +
+        '<button class="btn primary" data-act="save">Сохранить</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(back);
+
+  back.addEventListener('click', ev => {
+    const act = ev.target.dataset ? ev.target.dataset.act : null;
+    if (ev.target === back || act === 'cancel'){ back.remove(); return; }
+
+    if (act === 'delete'){
+      if (!confirm('Удалить занятие из расписания?')) return;
+      const ds = ymd(state.date);
+      schedule[di] = schedule[di].filter(l => l.id !== lesson.id);
+      if (homework[ds]){
+        delete homework[ds][lesson.id];
+        if (!Object.keys(homework[ds]).length) delete homework[ds];
+      }
+      store.set('schedule', schedule);
+      store.set('homework', homework);
+      saveHomeworkToServer();
+      state.expandedId = null;
+      back.remove();
+      render({skipFade:true});
+      return;
+    }
+
+    if (act === 'save'){
+      const time    = back.querySelector('#f-time').value.trim() || '08:30–09:15';
+      const subject = back.querySelector('#f-subject').value.trim();
+      const teacher = back.querySelector('#f-teacher').value.trim();
+      const room    = back.querySelector('#f-room').value.trim();
+      if (!subject){ alert('Введите название предмета'); return; }
+
+      if (lesson){
+        lesson.time = time;
+        lesson.subject = subject;
+        lesson.teacher = teacher;
+        lesson.room = room;
+      } else {
+        const id = 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+        schedule[di].push({ id, time, subject, teacher, room });
+      }
+
+      store.set('schedule', schedule);
+      back.remove();
+      render({skipFade:true});
+    }
+  });
+}
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+updateAdminUI();
+render();
+
+// Подтягиваем свежие ДЗ из облака при запуске
+loadHomeworkFromServer().then(ok => {
+  if (ok) render({skipFade:true});
+});
+
+// И каждый раз, когда возвращаешься во вкладку
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden){
+    loadHomeworkFromServer().then(ok => {
+      if (ok) render({skipFade:true});
+    });
+  }
+});
+
+// Обновление раз в 30 секунд, пока приложение открыто
+setInterval(() => {
+  if (!document.hidden){
+    loadHomeworkFromServer().then(ok => {
+      if (ok) render({skipFade:true});
+    });
+  }
+}, 30000);
+
+/* ============================================================
+   ДОБАВЛЕНИЕ ИКОНКИ НА ГЛАВНЫЙ ЭКРАН (Telegram Mini App)
+   ============================================================ */
+(function initHomeScreenShortcut() {
+  if (!window.Telegram || !window.Telegram.WebApp) return;
+  const tg = window.Telegram.WebApp;
+  if (!tg.isVersionAtLeast || !tg.isVersionAtLeast('8.0')) return;
+
+  tg.checkHomeScreenStatus(function (status) {
+    console.log('Home Screen status:', status);
+    if (status === 'missed') {
+      setTimeout(showAddToHomeScreenPrompt, 2000);
+    }
+  });
+
+  tg.onEvent('homeScreenAdded', function () {
+    console.log('Иконка успешно добавлена на главный экран');
+    setSync('ok', '✓ иконка добавлена');
+  });
+
+  function showAddToHomeScreenPrompt() {
+    if (document.getElementById('homeScreenBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'homeScreenBanner';
+    banner.innerHTML =
+      '<div class="hs-icon">📲</div>' +
+      '<div class="hs-text">' +
+        '<div class="hs-title">Добавить на главный экран?</div>' +
+        '<div class="hs-sub">Быстрый доступ к расписанию в один тап</div>' +
+      '</div>' +
+      '<button class="hs-btn" id="hsAddBtn">Добавить</button>' +
+      '<button class="hs-close" id="hsCloseBtn">✕</button>';
+    document.body.appendChild(banner);
+
+    document.getElementById('hsAddBtn').onclick = function () {
+      try { tg.addToHomeScreen(); }
+      catch (e) { console.warn('addToHomeScreen failed:', e); }
+      banner.remove();
+    };
+    document.getElementById('hsCloseBtn').onclick = function () {
+      banner.remove();
+    };
+    setTimeout(function () {
+      if (banner.parentNode) banner.remove();
+    }, 15000);
+  }
+})();
+</script>
+</body>
+</html>
