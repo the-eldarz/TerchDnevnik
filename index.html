@@ -20,12 +20,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;margin:0;}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg);color:var(--text);overflow:hidden;
-  -webkit-font-smoothing:antialiased;
-  transition:background .2s ease,color .2s ease;
-}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased;transition:background .2s ease,color .2s ease;}
 .app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
 header{background:var(--card);border-bottom:1px solid var(--border);flex:0 0 auto;padding-top:env(safe-area-inset-top);transition:background .2s ease,border-color .2s ease;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 2px;gap:8px;}
@@ -71,6 +66,21 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .no-teacher{color:var(--muted);font-style:italic;font-size:13.5px;}
 .hw-display{position:relative;background:var(--hw-bg);border:1.5px solid var(--accent);border-left-width:5px;border-radius:12px;padding:13px 14px 13px 15px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;color:var(--text);box-shadow:0 2px 10px rgba(61,109,255,.10);}
 .hw-display::before{content:'ДЗ';display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
+
+/* Ряд ДЗ + карандаш (для админа) */
+.hw-view-row{display:flex;gap:10px;align-items:flex-start;}
+.hw-view-row .hw-display{flex:1;min-width:0;}
+.hw-view-row .no-hw{flex:1;min-width:0;display:flex;align-items:center;min-height:42px;padding:0 4px;}
+.pencil-btn{
+  flex:0 0 auto;
+  width:42px;height:42px;border-radius:12px;
+  background:var(--accent-soft);color:var(--accent);
+  border:none;font-size:17px;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s ease,background .15s ease;
+}
+.pencil-btn:active{transform:scale(.92);background:var(--accent);color:#fff;}
+
 .hw-edit{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:11px;font-size:14.5px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:60px;}
 .hw-edit:focus{border-color:var(--accent);background:var(--card);}
 .hw-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -78,6 +88,8 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .save-hw:active{opacity:.85;}
 .delete-hw{padding:9px 16px;border-radius:10px;border:none;background:rgba(229,72,77,.12);color:var(--danger);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .delete-hw:active{opacity:.8;}
+.cancel-hw{padding:9px 16px;border-radius:10px;border:none;background:var(--bg);color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
+.cancel-hw:active{opacity:.75;}
 .btn-edit-lesson{margin-top:8px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;font-family:inherit;}
 .empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:15px;}
 .empty .big{font-size:34px;display:block;margin-bottom:10px;}
@@ -175,7 +187,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 12;
+const VERSION    = 13;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
@@ -349,7 +361,7 @@ function getTeacher(lesson){
   return '';
 }
 
-const state = { view:'day', date:new Date(), expandedId:null };
+const state = { view:'day', date:new Date(), expandedId:null, editingHwId:null };
 
 function render(opts){
   opts = opts || {};
@@ -383,17 +395,40 @@ function renderDay(){
       const hwText = hw[l.id] || '';
       const room = getRoom(l, di), teacher = getTeacher(l);
       const expanded = state.expandedId === l.id;
+      const editing = state.editingHwId === l.id;
+
       let hwBlock;
-      if (isAdmin){
-        hwBlock = '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' + esc(hwText) + '</textarea><div class="hw-actions"><button class="save-hw" data-save="' + esc(l.id) + '">Сохранить ДЗ</button>' + (hwText ? '<button class="delete-hw" data-delete-hw="' + esc(l.id) + '">Удалить ДЗ</button>' : '') + '</div>';
+
+      if (isAdmin && editing){
+        // Режим редактирования — textarea + кнопки
+        hwBlock =
+          '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' + esc(hwText) + '</textarea>' +
+          '<div class="hw-actions">' +
+            '<button class="save-hw" data-save="' + esc(l.id) + '">Сохранить</button>' +
+            (hwText ? '<button class="delete-hw" data-delete-hw="' + esc(l.id) + '">Удалить</button>' : '') +
+            '<button class="cancel-hw" data-cancel-hw="' + esc(l.id) + '">Отмена</button>' +
+          '</div>';
+      } else if (isAdmin){
+        // Просмотр с карандашом
+        hwBlock =
+          '<div class="hw-view-row">' +
+            (hwText
+              ? '<div class="hw-display">' + esc(hwText) + '</div>'
+              : '<div class="no-hw">Домашнее задание не задано</div>') +
+            '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" title="Изменить ДЗ" aria-label="Изменить ДЗ">✎</button>' +
+          '</div>';
       } else {
-        hwBlock = hwText ? '<div class="hw-display">' + esc(hwText) + '</div>' : '<div class="no-hw">Домашнее задание не задано</div>';
+        // Обычный пользователь
+        hwBlock = hwText
+          ? '<div class="hw-display">' + esc(hwText) + '</div>'
+          : '<div class="no-hw">Домашнее задание не задано</div>';
       }
+
       html += '<div class="lesson' + (hwText ? ' has-hw' : '') + (expanded ? ' expanded' : '') + '" data-lesson="' + esc(l.id) + '"><div class="lesson-row"><div class="time-col"><div class="time">' + esc(l.time) + '</div><div class="num">' + (i+1) + '</div></div><div class="info"><div class="subject">' + esc(displaySubject(l.subject)) + '</div></div><div class="chev">›</div></div><div class="details"><div class="detail-row"><div class="detail-label">Преподаватель</div>' + (teacher ? '<div class="detail-value teacher">' + esc(teacher) + '</div>' : '<div class="no-teacher">не указан</div>') + '</div><div class="detail-row"><div class="detail-label">Кабинет</div><div class="detail-value room">' + (room ? (room === 'Спортзал' ? esc(room) : 'каб. ' + esc(room)) : 'не указан') + '</div></div><div class="detail-row"><div class="detail-label">Домашнее задание</div>' + hwBlock + '</div>' + (isAdmin ? '<button class="btn-edit-lesson" data-edit="' + esc(l.id) + '">Изменить занятие</button>' : '') + '</div></div>';
     });
     html += '</div>';
   }
-  if (isAdmin) html += '<button class="add-btn" id="addLesson">+ Добавить занятие</button><div class="hint">Нажмите на занятие, чтобы развернуть данные.<br>В развёрнутом виде админ может сохранить, удалить ДЗ и изменить занятие.</div>';
+  if (isAdmin) html += '<button class="add-btn" id="addLesson">+ Добавить занятие</button><div class="hint">Нажмите на занятие, чтобы развернуть данные.<br>Карандаш ✎ рядом с ДЗ — редактирование домашнего задания.</div>';
   else html += '<div class="hint">Нажмите на занятие, чтобы увидеть преподавателя, кабинет и домашнее задание.</div>';
   content.innerHTML = html;
 }
@@ -435,6 +470,7 @@ function renderMonth(){
 let animating = false;
 function applyShift(delta){
   state.expandedId = null;
+  state.editingHwId = null;
   if (state.view === 'day') state.date = addDays(state.date, delta);
   else if (state.view === 'week') state.date = addDays(state.date, delta * 7);
   else { const x = new Date(state.date); x.setDate(1); x.setMonth(x.getMonth() + delta); state.date = x; }
@@ -443,8 +479,8 @@ function shiftNoAnim(delta){ if (animating) return; applyShift(delta); render();
 
 $('prevBtn').onclick = () => shiftNoAnim(-1);
 $('nextBtn').onclick = () => shiftNoAnim(1);
-$('todayBtn').onclick = () => { if (animating) return; state.date = new Date(); state.expandedId = null; render(); main.scrollTop = 0; };
-document.querySelectorAll('.bottom button').forEach(btn => { btn.onclick = () => { if (animating) return; state.view = btn.dataset.view; state.expandedId = null; document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b === btn)); render(); main.scrollTop = 0; }; });
+$('todayBtn').onclick = () => { if (animating) return; state.date = new Date(); state.expandedId = null; state.editingHwId = null; render(); main.scrollTop = 0; };
+document.querySelectorAll('.bottom button').forEach(btn => { btn.onclick = () => { if (animating) return; state.view = btn.dataset.view; state.expandedId = null; state.editingHwId = null; document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b === btn)); render(); main.scrollTop = 0; }; });
 
 let startX = 0, startY = 0, curDx = 0, dragging = false, dirLocked = null;
 main.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; if (animating) return; if (document.querySelector('.modal-back')) return; startX = e.touches[0].clientX; startY = e.touches[0].clientY; curDx = 0; dragging = false; dirLocked = null; }, {passive:true});
@@ -491,6 +527,29 @@ function finishSwipe(direction){
 document.addEventListener('keydown', e => { if (document.querySelector('.modal-back')) return; if (e.key === 'ArrowLeft') shiftNoAnim(-1); if (e.key === 'ArrowRight') shiftNoAnim(1); });
 
 content.addEventListener('click', async e => {
+
+  // 1) Карандаш рядом с ДЗ — открываем редактор
+  const pencilBtn = e.target.closest('[data-edit-hw]');
+  if (pencilBtn && isAdmin){
+    state.editingHwId = pencilBtn.dataset.editHw;
+    render({skipFade:true});
+    // Автофокус на textarea
+    setTimeout(() => {
+      const ta = content.querySelector('[data-hw-for="' + state.editingHwId + '"]');
+      if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+    }, 80);
+    return;
+  }
+
+  // 2) Отмена редактирования
+  const cancelBtn = e.target.closest('[data-cancel-hw]');
+  if (cancelBtn && isAdmin){
+    state.editingHwId = null;
+    render({skipFade:true});
+    return;
+  }
+
+  // 3) Сохранить ДЗ
   const saveBtn = e.target.closest('[data-save]');
   if (saveBtn && isAdmin){
     const lessonId = saveBtn.dataset.save;
@@ -500,36 +559,52 @@ content.addEventListener('click', async e => {
       if (!homework[ds]) homework[ds] = {};
       if (val) homework[ds][lessonId] = val; else delete homework[ds][lessonId];
       if (!Object.keys(homework[ds]).length) delete homework[ds];
-      store.set('homework', homework); render({skipFade:true});
+      store.set('homework', homework);
+      state.editingHwId = null;  // свернуть редактор
+      render({skipFade:true});
       const ok = await saveHomeworkToServer();
       if (!ok) alert('Не удалось сохранить в облако. Проверь интернет.');
     }
     return;
   }
+
+  // 4) Удалить ДЗ
   const delHw = e.target.closest('[data-delete-hw]');
   if (delHw && isAdmin){
     const lessonId = delHw.dataset.deleteHw;
     if (!confirm('Удалить домашнее задание для этого занятия?')) return;
     const ds = ymd(state.date);
     if (homework[ds]){ delete homework[ds][lessonId]; if (!Object.keys(homework[ds]).length) delete homework[ds]; }
-    store.set('homework', homework); render({skipFade:true});
+    store.set('homework', homework);
+    state.editingHwId = null;
+    render({skipFade:true});
     const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить в облако.');
     return;
   }
+
+  // 5) Изменить занятие
   const editBtn = e.target.closest('[data-edit]');
   if (editBtn && isAdmin){ openEditor(editBtn.dataset.edit); return; }
+
+  // 6) Добавить занятие
   if (e.target.id === 'addLesson'){ openEditor(null); return; }
+
+  // 7) Развернуть/свернуть карточку
   const lessonEl = e.target.closest('[data-lesson]');
   if (lessonEl){
     if (e.target.closest('textarea') || e.target.closest('button')) return;
     const id = lessonEl.dataset.lesson;
-    state.expandedId = (state.expandedId === id) ? null : id;
+    const willExpand = (state.expandedId !== id);
+    state.expandedId = willExpand ? id : null;
+    state.editingHwId = null;  // при сворачивании/разворачивании закрываем редактор
     render({skipFade:true});
     return;
   }
+
+  // 8) Переход в день
   const dayCell = e.target.closest('[data-date]');
   if (dayCell && state.view !== 'day'){
-    state.date = parseYmd(dayCell.dataset.date); state.view = 'day'; state.expandedId = null;
+    state.date = parseYmd(dayCell.dataset.date); state.view = 'day'; state.expandedId = null; state.editingHwId = null;
     document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b.dataset.view === 'day'));
     render(); main.scrollTop = 0;
   }
@@ -538,112 +613,31 @@ content.addEventListener('click', async e => {
 function updateAdminUI(){ adminBtn.classList.toggle('on', isAdmin); }
 adminBtn.onclick = openSettings;
 
-/* ======================= НАСТРОЙКИ ======================= */
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
-
   const tg = window.Telegram && window.Telegram.WebApp;
-  const canAddShortcut =
-    tg &&
-    typeof tg.addToHomeScreen === 'function' &&
-    (!tg.isVersionAtLeast || tg.isVersionAtLeast('8.0'));
+  const canAddShortcut = tg && typeof tg.addToHomeScreen === 'function' && (!tg.isVersionAtLeast || tg.isVersionAtLeast('8.0'));
 
-  back.innerHTML =
-    '<div class="modal">' +
-      '<div class="modal-title">Настройки</div>' +
-
-      '<div class="settings-section">' +
-        '<div class="settings-label">Тема оформления</div>' +
-        '<div class="theme-toggle">' +
-          '<button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button>' +
-          '<button class="theme-opt' + (currentTheme === 'dark'  ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="settings-section">' +
-        '<div class="settings-label">Названия предметов</div>' +
-        '<div class="theme-toggle">' +
-          '<button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button>' +
-          '<button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button>' +
-        '</div>' +
-        '<div class="settings-hint">' +
-          'Короткие: «Общество», «Англ. яз.», «Русс. яз.», «Каб. яз.».<br>' +
-          'Полные: «Обществознание», «Английский язык», «Русский язык», «Кабардинский язык».' +
-        '</div>' +
-      '</div>' +
-
-      (canAddShortcut
-        ? '<div class="settings-section">' +
-            '<div class="settings-label">Ярлык на главный экран</div>' +
-            '<button class="btn primary" data-act="addHomeScreen" style="width:100%">📲 Добавить на главный экран</button>' +
-            '<div class="settings-hint">Приложение появится на рабочем столе как обычная иконка.</div>' +
-          '</div>'
-        : '') +
-
-      '<div class="settings-section">' +
-        '<div class="settings-label">Профиль администратора</div>' +
-        (isAdmin
-          ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div>' +
-            '<button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>'
-          : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>'
-        ) +
-      '</div>' +
-
-      '<div class="modal-actions">' +
-        '<button class="btn ghost" data-act="cancel">Закрыть</button>' +
-      '</div>' +
-    '</div>';
+  back.innerHTML = '<div class="modal"><div class="modal-title">Настройки</div>' +
+    '<div class="settings-section"><div class="settings-label">Тема оформления</div><div class="theme-toggle"><button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button><button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button></div></div>' +
+    '<div class="settings-section"><div class="settings-label">Названия предметов</div><div class="theme-toggle"><button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button><button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button></div><div class="settings-hint">Короткие: «Общество», «Англ. яз.», «Русс. яз.», «Каб. яз.».<br>Полные: «Обществознание», «Английский язык», «Русский язык», «Кабардинский язык».</div></div>' +
+    (canAddShortcut ? '<div class="settings-section"><div class="settings-label">Ярлык на главный экран</div><button class="btn primary" data-act="addHomeScreen" style="width:100%">📲 Добавить на главный экран</button><div class="settings-hint">Приложение появится на рабочем столе как обычная иконка.</div></div>' : '') +
+    '<div class="settings-section"><div class="settings-label">Профиль администратора</div>' + (isAdmin ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>' : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>') + '</div>' +
+    '<div class="modal-actions"><button class="btn ghost" data-act="cancel">Закрыть</button></div></div>';
 
   document.body.appendChild(back);
 
   back.addEventListener('click', ev => {
     const themeBtn = ev.target.closest('[data-theme-set]');
-    if (themeBtn){
-      applyTheme(themeBtn.dataset.themeSet);
-      back.querySelectorAll('[data-theme-set]').forEach(b =>
-        b.classList.toggle('active', b.dataset.themeSet === currentTheme));
-      return;
-    }
-
+    if (themeBtn){ applyTheme(themeBtn.dataset.themeSet); back.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('active', b.dataset.themeSet === currentTheme)); return; }
     const shortBtn = ev.target.closest('[data-short]');
-    if (shortBtn){
-      shortNames = shortBtn.dataset.short === '1';
-      store.set('shortNames', shortNames);
-      back.querySelectorAll('[data-short]').forEach(b =>
-        b.classList.toggle('active', (b.dataset.short === '1') === shortNames));
-      render({skipFade:true});
-      return;
-    }
-
+    if (shortBtn){ shortNames = shortBtn.dataset.short === '1'; store.set('shortNames', shortNames); back.querySelectorAll('[data-short]').forEach(b => b.classList.toggle('active', (b.dataset.short === '1') === shortNames)); render({skipFade:true}); return; }
     const act = ev.target.dataset ? ev.target.dataset.act : null;
     if (ev.target === back || act === 'cancel'){ back.remove(); return; }
-
-    if (act === 'addHomeScreen'){
-      try {
-        tg.addToHomeScreen();
-        back.remove();
-      } catch (e){
-        alert('Не удалось добавить ярлык. Попробуй позже.');
-      }
-      return;
-    }
-
-    if (act === 'openLogin'){
-      back.remove();
-      openAdminLogin();
-      return;
-    }
-
-    if (act === 'logout'){
-      if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return;
-      isAdmin = false;
-      store.set('admin', false);
-      updateAdminUI();
-      back.remove();
-      render();
-      return;
-    }
+    if (act === 'addHomeScreen'){ try { tg.addToHomeScreen(); back.remove(); } catch(e){ alert('Не удалось добавить ярлык. Попробуй позже.'); } return; }
+    if (act === 'openLogin'){ back.remove(); openAdminLogin(); return; }
+    if (act === 'logout'){ if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return; isAdmin = false; store.set('admin', false); updateAdminUI(); back.remove(); render(); return; }
   });
 }
 
@@ -683,7 +677,7 @@ function openEditor(lessonId){
       schedule[di] = schedule[di].filter(l => l.id !== lesson.id);
       if (homework[ds]){ delete homework[ds][lesson.id]; if (!Object.keys(homework[ds]).length) delete homework[ds]; }
       store.set('schedule', schedule); store.set('homework', homework); saveHomeworkToServer();
-      state.expandedId = null; back.remove(); render({skipFade:true});
+      state.expandedId = null; state.editingHwId = null; back.remove(); render({skipFade:true});
       return;
     }
     if (act === 'save'){
@@ -711,47 +705,25 @@ setInterval(() => { if (!document.hidden) loadHomeworkFromServer().then(ok => { 
 (function initHomeScreenShortcut(){
   const tg = window.Telegram && window.Telegram.WebApp;
   if (!tg) { console.log('[HS] Telegram WebApp не найден'); return; }
-
   console.log('[HS] version:', tg.version, 'platform:', tg.platform);
 
   const hasCheck = typeof tg.checkHomeScreenStatus === 'function';
   const hasAdd   = typeof tg.addToHomeScreen === 'function';
-
-  if (!hasCheck && !hasAdd){
-    console.log('[HS] метод не поддерживается этой версией Telegram');
-    return;
-  }
+  if (!hasCheck && !hasAdd){ console.log('[HS] метод не поддерживается'); return; }
 
   tg.ready && tg.ready();
   tg.expand && tg.expand();
 
-  tg.onEvent && tg.onEvent('homeScreenAdded', function () {
-    console.log('[HS] иконка добавлена');
-    setSync('ok', '✓ иконка добавлена');
-  });
-  tg.onEvent && tg.onEvent('homeScreenFailed', function () {
-    console.log('[HS] не удалось добавить иконку');
-  });
+  tg.onEvent && tg.onEvent('homeScreenAdded', function () { setSync('ok', '✓ иконка добавлена'); });
+  tg.onEvent && tg.onEvent('homeScreenFailed', function () { console.log('[HS] не удалось добавить иконку'); });
 
   function showBanner(){
     if (document.getElementById('homeScreenBanner')) return;
     const banner = document.createElement('div');
     banner.id = 'homeScreenBanner';
-    banner.innerHTML =
-      '<div class="hs-icon">📲</div>' +
-      '<div class="hs-text">' +
-        '<div class="hs-title">Добавить на главный экран?</div>' +
-        '<div class="hs-sub">Быстрый доступ к расписанию в один тап</div>' +
-      '</div>' +
-      '<button class="hs-btn" id="hsAddBtn">Добавить</button>' +
-      '<button class="hs-close" id="hsCloseBtn">✕</button>';
+    banner.innerHTML = '<div class="hs-icon">📲</div><div class="hs-text"><div class="hs-title">Добавить на главный экран?</div><div class="hs-sub">Быстрый доступ к расписанию в один тап</div></div><button class="hs-btn" id="hsAddBtn">Добавить</button><button class="hs-close" id="hsCloseBtn">✕</button>';
     document.body.appendChild(banner);
-
-    document.getElementById('hsAddBtn').onclick = function(){
-      try { tg.addToHomeScreen(); }
-      catch (e) { console.warn('[HS] ошибка addToHomeScreen:', e); }
-      banner.remove();
-    };
+    document.getElementById('hsAddBtn').onclick = function(){ try { tg.addToHomeScreen(); } catch (e) {} banner.remove(); };
     document.getElementById('hsCloseBtn').onclick = function(){ banner.remove(); };
     setTimeout(function(){ if (banner.parentNode) banner.remove(); }, 20000);
   }
@@ -761,17 +733,10 @@ setInterval(() => { if (!document.hidden) loadHomeworkFromServer().then(ok => { 
       try {
         tg.checkHomeScreenStatus(function(status){
           console.log('[HS] статус:', status);
-          if (status === 'missed' || status === 'unknown'){
-            showBanner();
-          }
+          if (status === 'missed' || status === 'unknown') showBanner();
         });
-      } catch (e) {
-        console.warn('[HS] checkHomeScreenStatus ошибка:', e);
-        showBanner();
-      }
-    } else {
-      if (hasAdd) showBanner();
-    }
+      } catch (e) { showBanner(); }
+    } else { if (hasAdd) showBanner(); }
   }, 2000);
 })();
 </script>
