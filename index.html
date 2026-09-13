@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Расписание</title>
+<!-- ⬇️⬇️⬇️ ГЛАВНЫЙ ФИКС: SDK Telegram ⬇️⬇️⬇️ -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
   --bg:#f2f4f8; --card:#fff; --text:#12161c; --muted:#7c8695;
@@ -144,49 +146,18 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .sync-badge.ok{color:#16a34a;}
 .sync-badge.err{color:var(--danger);}
 .sync-badge.sync{color:var(--accent);}
-
-/* ================= Диалог выбора способа запуска ================= */
-#launchChoice{
-  position:fixed;inset:0;
-  background:rgba(15,20,30,.72);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  display:flex;align-items:center;justify-content:center;
-  z-index:300;padding:20px;
-  animation:fadeBg .25s ease;
-}
-.launch-card{
-  background:var(--card);color:var(--text);
-  border-radius:22px;padding:26px 22px 22px;
-  max-width:420px;width:100%;
-  box-shadow:0 20px 60px rgba(0,0,0,.3);
-  animation:slideUp .3s cubic-bezier(.2,.9,.3,1);
-}
+#launchChoice{position:fixed;inset:0;background:rgba(15,20,30,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;animation:fadeBg .25s ease;}
+.launch-card{background:var(--card);color:var(--text);border-radius:22px;padding:26px 22px 22px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .3s cubic-bezier(.2,.9,.3,1);}
 .launch-title{font-size:20px;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:-.3px;}
 .launch-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.4;}
-.launch-btn{
-  width:100%;display:flex;align-items:center;gap:14px;
-  padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);
-  background:var(--bg);color:var(--text);
-  cursor:pointer;font-family:inherit;text-align:left;
-  margin-bottom:10px;transition:all .15s ease;
-}
+.launch-btn{width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit;text-align:left;margin-bottom:10px;transition:all .15s ease;}
 .launch-btn:last-child{margin-bottom:0;}
 .launch-btn:active{transform:scale(.98);border-color:var(--accent);background:var(--accent-soft);}
 .launch-btn .lb-icon{font-size:26px;flex:0 0 auto;}
 .launch-btn .lb-text{flex:1;min-width:0;}
 .launch-btn .lb-title{font-weight:700;font-size:15px;display:block;margin-bottom:2px;}
 .launch-btn .lb-sub{font-size:12px;color:var(--muted);display:block;line-height:1.3;}
-
-/* Плашка установки */
-#installBanner{
-  position:fixed;left:12px;right:12px;
-  bottom:calc(70px + env(safe-area-inset-bottom));
-  background:var(--card);color:var(--text);
-  border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18);
-  padding:12px 14px;display:flex;align-items:flex-start;gap:10px;
-  z-index:200;animation:hsSlideUp .35s cubic-bezier(.2,.9,.3,1);
-  border:1px solid var(--border);
-}
+#installBanner{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--card);color:var(--text);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;z-index:200;animation:hsSlideUp .35s cubic-bezier(.2,.9,.3,1);border:1px solid var(--border);}
 @keyframes hsSlideUp{from{transform:translateY(80px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 #installBanner .ib-icon{font-size:22px;flex:0 0 auto;line-height:1.1;}
 #installBanner .ib-text{flex:1;min-width:0;}
@@ -194,18 +165,9 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 #installBanner .ib-sub{font-size:11.5px;color:var(--muted);line-height:1.4;}
 #installBanner .ib-sub b{color:var(--accent);}
 #installBanner .ib-actions{display:flex;gap:6px;margin-top:8px;}
-#installBanner .ib-btn{
-  background:var(--accent);color:#fff;border:none;
-  border-radius:9px;padding:8px 13px;
-  font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;
-}
+#installBanner .ib-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;}
 #installBanner .ib-btn:active{opacity:.8;}
-#installBanner .ib-close{
-  flex:0 0 auto;background:transparent;border:none;
-  color:var(--muted);font-size:16px;cursor:pointer;
-  padding:2px 6px;font-family:inherit;
-  align-self:flex-start;
-}
+#installBanner .ib-close{flex:0 0 auto;background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;font-family:inherit;align-self:flex-start;}
 </style>
 </head>
 <body>
@@ -233,23 +195,23 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 14;
+const VERSION    = 15;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 
 const SUBJECT_PAIRS = [
-  { short:'Разг. о важ.',     long:'Разговоры о важном' },
-  { short:'Матем.',           long:'Математика' },
-  { short:'Общество',         long:'Обществознание' },
-  { short:'Англ. яз.',        long:'Английский язык' },
-  { short:'Англ. язык',       long:'Английский язык' },
-  { short:'Анг. яз.',         long:'Английский язык' },
-  { short:'Русс. яз.',        long:'Русский язык' },
-  { short:'Каб. яз.',         long:'Кабардинский язык' },
-  { short:'Каб. язык',        long:'Кабардинский язык' },
-  { short:'Каб. литература',  long:'Кабардинская литература' },
-  { short:'Физ-ра',           long:'Физическая культура' }
+  { short:'Разг. о важ.', long:'Разговоры о важном' },
+  { short:'Матем.', long:'Математика' },
+  { short:'Общество', long:'Обществознание' },
+  { short:'Англ. яз.', long:'Английский язык' },
+  { short:'Англ. язык', long:'Английский язык' },
+  { short:'Анг. яз.', long:'Английский язык' },
+  { short:'Русс. яз.', long:'Русский язык' },
+  { short:'Каб. яз.', long:'Кабардинский язык' },
+  { short:'Каб. язык', long:'Кабардинский язык' },
+  { short:'Каб. литература', long:'Кабардинская литература' },
+  { short:'Физ-ра', long:'Физическая культура' }
 ];
 
 const RULES = [
@@ -268,7 +230,7 @@ const RULES = [
 
 const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const MONTHS_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const DOW_FULL  = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+const DOW_FULL = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
 const DOW_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 const DEFAULT_SCHEDULE = [
@@ -295,10 +257,10 @@ const store = {
 
 let schedule = store.get('schedule', DEFAULT_SCHEDULE);
 let homework = store.get('homework', {});
-let isAdmin  = store.get('admin', false);
+let isAdmin = store.get('admin', false);
 let currentTheme = store.get('theme', 'light');
-let shortNames   = store.get('shortNames', true);
-let launchMode   = store.get('launchMode', null); // 'telegram' | 'browser' | null
+let shortNames = store.get('shortNames', true);
+let launchMode = store.get('launchMode', null);
 
 function applyTheme(theme){
   currentTheme = theme;
@@ -338,11 +300,7 @@ async function loadHomeworkFromServer(){
     } else { homework = {}; }
     setSync('ok', '✓ синхронизировано');
     return true;
-  } catch (e) {
-    console.warn('Не удалось загрузить ДЗ:', e);
-    setSync('err', '⚠ оффлайн');
-    return false;
-  }
+  } catch (e) { console.warn(e); setSync('err', '⚠ оффлайн'); return false; }
 }
 
 async function saveHomeworkToServer(){
@@ -358,11 +316,7 @@ async function saveHomeworkToServer(){
     if (!r.ok) throw new Error('HTTP ' + r.status);
     setSync('ok', '✓ сохранено');
     return true;
-  } catch (e) {
-    console.warn('Не удалось сохранить ДЗ:', e);
-    setSync('err', '⚠ ошибка');
-    return false;
-  }
+  } catch (e) { console.warn(e); setSync('err', '⚠ ошибка'); return false; }
 }
 
 const $ = id => document.getElementById(id);
@@ -379,9 +333,7 @@ function sortLessons(arr){ return arr.slice().sort((a,b)=> (a.time||'').localeCo
 function displaySubject(raw){
   if (!raw) return '';
   const s = String(raw).trim();
-  for (const p of SUBJECT_PAIRS){
-    if (s === p.short || s === p.long) return shortNames ? p.short : p.long;
-  }
+  for (const p of SUBJECT_PAIRS){ if (s === p.short || s === p.long) return shortNames ? p.short : p.long; }
   return s;
 }
 
@@ -402,9 +354,7 @@ function getRoom(lesson, dow){
 function getTeacher(lesson){
   if (lesson.teacher && lesson.teacher.trim()) return lesson.teacher.trim();
   const s = (lesson.subject || '').trim().toLowerCase();
-  for (const r of RULES){
-    for (const k of r.keys){ if (s.includes(k)) return r.teacher || ''; }
-  }
+  for (const r of RULES){ for (const k of r.keys){ if (s.includes(k)) return r.teacher || ''; } }
   return '';
 }
 
@@ -553,7 +503,6 @@ function finishSwipe(direction){
 document.addEventListener('keydown', e => { if (document.querySelector('.modal-back')) return; if (e.key === 'ArrowLeft') shiftNoAnim(-1); if (e.key === 'ArrowRight') shiftNoAnim(1); });
 
 content.addEventListener('click', async e => {
-
   const pencilBtn = e.target.closest('[data-edit-hw]');
   if (pencilBtn && isAdmin){
     state.editingHwId = pencilBtn.dataset.editHw;
@@ -564,10 +513,8 @@ content.addEventListener('click', async e => {
     }, 80);
     return;
   }
-
   const cancelBtn = e.target.closest('[data-cancel-hw]');
   if (cancelBtn && isAdmin){ state.editingHwId = null; render({skipFade:true}); return; }
-
   const saveBtn = e.target.closest('[data-save]');
   if (saveBtn && isAdmin){
     const lessonId = saveBtn.dataset.save;
@@ -577,32 +524,24 @@ content.addEventListener('click', async e => {
       if (!homework[ds]) homework[ds] = {};
       if (val) homework[ds][lessonId] = val; else delete homework[ds][lessonId];
       if (!Object.keys(homework[ds]).length) delete homework[ds];
-      store.set('homework', homework);
-      state.editingHwId = null;
-      render({skipFade:true});
-      const ok = await saveHomeworkToServer();
-      if (!ok) alert('Не удалось сохранить в облако. Проверь интернет.');
+      store.set('homework', homework); state.editingHwId = null; render({skipFade:true});
+      const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить в облако.');
     }
     return;
   }
-
   const delHw = e.target.closest('[data-delete-hw]');
   if (delHw && isAdmin){
     const lessonId = delHw.dataset.deleteHw;
     if (!confirm('Удалить домашнее задание для этого занятия?')) return;
     const ds = ymd(state.date);
     if (homework[ds]){ delete homework[ds][lessonId]; if (!Object.keys(homework[ds]).length) delete homework[ds]; }
-    store.set('homework', homework);
-    state.editingHwId = null;
-    render({skipFade:true});
-    const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить в облако.');
+    store.set('homework', homework); state.editingHwId = null; render({skipFade:true});
+    const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить.');
     return;
   }
-
   const editBtn = e.target.closest('[data-edit]');
   if (editBtn && isAdmin){ openEditor(editBtn.dataset.edit); return; }
   if (e.target.id === 'addLesson'){ openEditor(null); return; }
-
   const lessonEl = e.target.closest('[data-lesson]');
   if (lessonEl){
     if (e.target.closest('textarea') || e.target.closest('button')) return;
@@ -613,7 +552,6 @@ content.addEventListener('click', async e => {
     render({skipFade:true});
     return;
   }
-
   const dayCell = e.target.closest('[data-date]');
   if (dayCell && state.view !== 'day'){
     state.date = parseYmd(dayCell.dataset.date); state.view = 'day'; state.expandedId = null; state.editingHwId = null;
@@ -625,55 +563,17 @@ content.addEventListener('click', async e => {
 function updateAdminUI(){ adminBtn.classList.toggle('on', isAdmin); }
 adminBtn.onclick = openSettings;
 
-/* ======================= НАСТРОЙКИ ======================= */
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
-  const tg = window.Telegram && window.Telegram.WebApp;
-  const canAddShortcut = tg && typeof tg.addToHomeScreen === 'function' && (!tg.isVersionAtLeast || tg.isVersionAtLeast('8.0'));
-
-  const launchLabel = launchMode === 'telegram' ? '✈️ Telegram'
-                    : launchMode === 'browser' ? '🌐 Браузер'
-                    : '— не выбран —';
-
+  const launchLabel = launchMode === 'telegram' ? '✈️ Telegram' : launchMode === 'browser' ? '🌐 Браузер' : '— не выбран —';
   back.innerHTML = '<div class="modal"><div class="modal-title">Настройки</div>' +
-
-    '<div class="settings-section">' +
-      '<div class="settings-label">Тема оформления</div>' +
-      '<div class="theme-toggle">' +
-        '<button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button>' +
-        '<button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button>' +
-      '</div>' +
-    '</div>' +
-
-    '<div class="settings-section">' +
-      '<div class="settings-label">Названия предметов</div>' +
-      '<div class="theme-toggle">' +
-        '<button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button>' +
-        '<button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button>' +
-      '</div>' +
-      '<div class="settings-hint">Короткие: «Общество», «Англ. яз.», «Русс. яз.», «Каб. яз.».<br>Полные: «Обществознание», «Английский язык», «Русский язык», «Кабардинский язык».</div>' +
-    '</div>' +
-
-    '<div class="settings-section">' +
-      '<div class="settings-label">Способ запуска</div>' +
-      '<div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + launchLabel + '</b></div>' +
-      '<button class="btn primary" data-act="changeLaunch" style="width:100%">Изменить</button>' +
-      '<div class="settings-hint">Можно выбрать, как вы обычно открываете приложение — через Telegram или через браузер. От этого зависит предложение добавить ярлык.</div>' +
-    '</div>' +
-
-    '<div class="settings-section">' +
-      '<div class="settings-label">Профиль администратора</div>' +
-      (isAdmin
-        ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>'
-        : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>'
-      ) +
-    '</div>' +
-
+    '<div class="settings-section"><div class="settings-label">Тема оформления</div><div class="theme-toggle"><button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button><button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button></div></div>' +
+    '<div class="settings-section"><div class="settings-label">Названия предметов</div><div class="theme-toggle"><button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button><button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button></div></div>' +
+    '<div class="settings-section"><div class="settings-label">Способ запуска</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + launchLabel + '</b></div><button class="btn primary" data-act="changeLaunch" style="width:100%">Изменить</button></div>' +
+    '<div class="settings-section"><div class="settings-label">Профиль администратора</div>' + (isAdmin ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>' : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>') + '</div>' +
     '<div class="modal-actions"><button class="btn ghost" data-act="cancel">Закрыть</button></div></div>';
-
   document.body.appendChild(back);
-
   back.addEventListener('click', ev => {
     const themeBtn = ev.target.closest('[data-theme-set]');
     if (themeBtn){ applyTheme(themeBtn.dataset.themeSet); back.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('active', b.dataset.themeSet === currentTheme)); return; }
@@ -681,13 +581,7 @@ function openSettings(){
     if (shortBtn){ shortNames = shortBtn.dataset.short === '1'; store.set('shortNames', shortNames); back.querySelectorAll('[data-short]').forEach(b => b.classList.toggle('active', (b.dataset.short === '1') === shortNames)); render({skipFade:true}); return; }
     const act = ev.target.dataset ? ev.target.dataset.act : null;
     if (ev.target === back || act === 'cancel'){ back.remove(); return; }
-    if (act === 'changeLaunch'){
-      back.remove();
-      launchMode = null;
-      store.set('launchMode', null);
-      showLaunchChoice();
-      return;
-    }
+    if (act === 'changeLaunch'){ back.remove(); launchMode = null; store.set('launchMode', null); showLaunchChoice(); return; }
     if (act === 'openLogin'){ back.remove(); openAdminLogin(); return; }
     if (act === 'logout'){ if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return; isAdmin = false; store.set('admin', false); updateAdminUI(); back.remove(); render(); return; }
   });
@@ -749,33 +643,22 @@ function openEditor(lessonId){
    ВЫБОР СПОСОБА ЗАПУСКА
    ============================================================ */
 function showLaunchChoice(){
-  // Если уже открыт — не дублируем
   if (document.getElementById('launchChoice')) return;
-
   const overlay = document.createElement('div');
   overlay.id = 'launchChoice';
-  overlay.innerHTML =
-    '<div class="launch-card">' +
+  overlay.innerHTML = '<div class="launch-card">' +
       '<div class="launch-title">Как вы открыли приложение?</div>' +
       '<div class="launch-sub">Мы подберём удобный способ закрепить его на главном экране</div>' +
       '<button class="launch-btn" data-launch="telegram">' +
         '<span class="lb-icon">✈️</span>' +
-        '<span class="lb-text">' +
-          '<span class="lb-title">Через Telegram</span>' +
-          '<span class="lb-sub">Открываю через бота</span>' +
-        '</span>' +
+        '<span class="lb-text"><span class="lb-title">Через Telegram</span><span class="lb-sub">Открываю через бота</span></span>' +
       '</button>' +
       '<button class="launch-btn" data-launch="browser">' +
         '<span class="lb-icon">🌐</span>' +
-        '<span class="lb-text">' +
-          '<span class="lb-title">Через браузер</span>' +
-          '<span class="lb-sub">Открываю ссылку в Safari / Chrome</span>' +
-        '</span>' +
+        '<span class="lb-text"><span class="lb-title">Через браузер</span><span class="lb-sub">Открываю ссылку в Safari / Chrome</span></span>' +
       '</button>' +
     '</div>';
-
   document.body.appendChild(overlay);
-
   overlay.addEventListener('click', ev => {
     const btn = ev.target.closest('[data-launch]');
     if (!btn) return;
@@ -783,24 +666,19 @@ function showLaunchChoice(){
     launchMode = mode;
     store.set('launchMode', mode);
     overlay.remove();
-    // Небольшая пауза, чтобы UI успокоился, потом показываем плашку
-    setTimeout(() => showInstallBanner(mode), 800);
+    setTimeout(() => showInstallBanner(mode), 400);
   });
 }
 
 /* ============================================================
-   ПЛАШКА УСТАНОВКИ — Telegram или Браузер
+   ПЛАШКА УСТАНОВКИ
    ============================================================ */
 let deferredPrompt = null;
 
-// Ловим событие установки PWA (Android/Chrome)
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  // Если пользователь уже выбрал "браузер" — можно сразу предложить
-  if (launchMode === 'browser' && !sessionStorage.getItem('ib_shown')){
-    showInstallBanner('browser');
-  }
+  if (launchMode === 'browser') showInstallBanner('browser');
 });
 
 window.addEventListener('appinstalled', () => {
@@ -818,44 +696,51 @@ function isIOS(){
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
 
+function getTelegramSDK(){
+  return (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+}
+
 function showInstallBanner(mode){
-  // Внутри Telegram могут быть свои правила
+  console.log('[Install] mode=', mode, 'tg=', !!getTelegramSDK());
+
   if (mode === 'telegram'){
-    const tg = window.Telegram && window.Telegram.WebApp;
+    const tg = getTelegramSDK();
     if (!tg){
-      // Пользователь выбрал Telegram, но открыт в браузере — мягкое уведомление
-      showSimpleBanner('✈️', 'Открыть в Telegram',
-        'Чтобы закрепить бота на главном экране, откройте приложение через бота в Telegram.');
+      // Всё ещё нет SDK. Через 500 мс попробуем ещё раз, потом покажем инструкцию.
+      setTimeout(() => {
+        const tg2 = getTelegramSDK();
+        if (tg2) showInstallBanner('telegram');
+        else showSimpleBanner('✈️', 'Открыть в Telegram',
+          'Чтобы закрепить бота на главном экране, откройте приложение через бота в Telegram.');
+      }, 600);
       return;
     }
     if (typeof tg.addToHomeScreen !== 'function'){
       showSimpleBanner('✈️', 'Ярлык в Telegram',
-        'На этом устройстве автоматическое добавление недоступно. Нажмите <b>три точки</b> в правом верхнем углу → <b>Добавить на главный экран</b>.');
+        'Нажмите <b>три точки</b> в правом верхнем углу → <b>Добавить на главный экран</b>.');
       return;
     }
-    // Спрашиваем у Telegram статус
     try {
       tg.checkHomeScreenStatus(function(status){
-        if (status === 'added'){ return; } // уже добавлено
+        console.log('[Install] homeScreen status:', status);
+        if (status === 'added') return;
         showBannerWithAction('📲', 'Добавить на главный экран?',
           'Быстрый доступ к расписанию в один тап',
-          'Добавить',
+          'Установить',
           function(){
-            try { tg.addToHomeScreen(); } catch(e){}
+            try { tg.addToHomeScreen(); } catch(e){ console.warn(e); }
           });
       });
     } catch(e){
-      // Если метод есть, но упал — показываем всё равно кнопку
       showBannerWithAction('📲', 'Добавить на главный экран?',
         'Быстрый доступ к расписанию в один тап',
-        'Добавить',
+        'Установить',
         function(){ try { tg.addToHomeScreen(); } catch(e){} });
     }
     return;
   }
 
   if (mode === 'browser'){
-    // Android Chrome — есть deferredPrompt
     if (deferredPrompt){
       showBannerWithAction('📲', 'Установить приложение?',
         'Быстрый доступ с рабочего стола, без браузера',
@@ -864,26 +749,19 @@ function showInstallBanner(mode){
           if (!deferredPrompt) return;
           try {
             deferredPrompt.prompt();
-            const choice = await deferredPrompt.userChoice;
-            console.log('[PWA] userChoice:', choice.outcome);
-          } catch(e){ console.warn(e); }
+            await deferredPrompt.userChoice;
+          } catch(e){}
           deferredPrompt = null;
           removeInstallBanner();
         });
       return;
     }
-
-    // iOS Safari — показываем инструкцию
     if (isIOS()){
       showSimpleBanner('📲', 'Установить на iPhone',
-        'Нажмите <b>Поделиться</b> <b style="font-size:15px;">⎙</b> внизу экрана → <b>«На экран Домой»</b> → <b>Добавить</b>.');
+        'Нажмите <b>Поделиться</b> внизу экрана → <b>«На экран Домой»</b> → <b>Добавить</b>.');
       return;
     }
-
-    // Desktop или другой браузер
-    if (window.matchMedia('(display-mode: standalone)').matches){
-      return; // уже установлено
-    }
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
     showSimpleBanner('🌐', 'Установить как приложение',
       'Откройте ссылку в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone), чтобы добавить на главный экран.');
   }
@@ -893,13 +771,7 @@ function showSimpleBanner(icon, title, subHtml){
   removeInstallBanner();
   const banner = document.createElement('div');
   banner.id = 'installBanner';
-  banner.innerHTML =
-    '<div class="ib-icon">' + icon + '</div>' +
-    '<div class="ib-text">' +
-      '<div class="ib-title">' + title + '</div>' +
-      '<div class="ib-sub">' + subHtml + '</div>' +
-    '</div>' +
-    '<button class="ib-close" id="ibClose">✕</button>';
+  banner.innerHTML = '<div class="ib-icon">' + icon + '</div><div class="ib-text"><div class="ib-title">' + title + '</div><div class="ib-sub">' + subHtml + '</div></div><button class="ib-close" id="ibClose">✕</button>';
   document.body.appendChild(banner);
   banner.querySelector('#ibClose').onclick = () => banner.remove();
   setTimeout(() => { if (banner.parentNode) banner.remove(); }, 25000);
@@ -909,14 +781,7 @@ function showBannerWithAction(icon, title, sub, btnLabel, action){
   removeInstallBanner();
   const banner = document.createElement('div');
   banner.id = 'installBanner';
-  banner.innerHTML =
-    '<div class="ib-icon">' + icon + '</div>' +
-    '<div class="ib-text">' +
-      '<div class="ib-title">' + title + '</div>' +
-      '<div class="ib-sub">' + sub + '</div>' +
-      '<div class="ib-actions"><button class="ib-btn" id="ibDo">' + btnLabel + '</button></div>' +
-    '</div>' +
-    '<button class="ib-close" id="ibClose">✕</button>';
+  banner.innerHTML = '<div class="ib-icon">' + icon + '</div><div class="ib-text"><div class="ib-title">' + title + '</div><div class="ib-sub">' + sub + '</div><div class="ib-actions"><button class="ib-btn" id="ibDo">' + btnLabel + '</button></div></div><button class="ib-close" id="ibClose">✕</button>';
   document.body.appendChild(banner);
   banner.querySelector('#ibDo').onclick = action;
   banner.querySelector('#ibClose').onclick = () => banner.remove();
@@ -932,15 +797,19 @@ loadHomeworkFromServer().then(ok => { if (ok) render({skipFade:true}); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) loadHomeworkFromServer().then(ok => { if (ok) render({skipFade:true}); }); });
 setInterval(() => { if (!document.hidden) loadHomeworkFromServer().then(ok => { if (ok) render({skipFade:true}); }); }, 30000);
 
-// Регистрация service worker (если есть)
 if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
 
-// Показываем диалог выбора при первом запуске
-// или сразу предлагаем установку, если выбор уже сделан
+// Ждём загрузки SDK Telegram перед показом диалога
+const tgSDK = getTelegramSDK();
+if (tgSDK){
+  tgSDK.ready && tgSDK.ready();
+  tgSDK.expand && tgSDK.expand();
+}
+
 setTimeout(() => {
   if (launchMode === null){
     showLaunchChoice();
