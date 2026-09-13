@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Расписание</title>
-<!-- ⬇️⬇️⬇️ ГЛАВНЫЙ ФИКС: SDK Telegram ⬇️⬇️⬇️ -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
@@ -195,7 +194,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 15;
+const VERSION    = 16;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
@@ -260,7 +259,7 @@ let homework = store.get('homework', {});
 let isAdmin = store.get('admin', false);
 let currentTheme = store.get('theme', 'light');
 let shortNames = store.get('shortNames', true);
-let launchMode = store.get('launchMode', null);
+let launchMode = store.get('launchMode', null); // 'chrome' | 'safari' | null
 
 function applyTheme(theme){
   currentTheme = theme;
@@ -566,11 +565,13 @@ adminBtn.onclick = openSettings;
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
-  const launchLabel = launchMode === 'telegram' ? '✈️ Telegram' : launchMode === 'browser' ? '🌐 Браузер' : '— не выбран —';
+  const launchLabel = launchMode === 'chrome' ? '🌐 Chrome'
+                    : launchMode === 'safari' ? '🧭 Safari'
+                    : '— не выбран —';
   back.innerHTML = '<div class="modal"><div class="modal-title">Настройки</div>' +
     '<div class="settings-section"><div class="settings-label">Тема оформления</div><div class="theme-toggle"><button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button><button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button></div></div>' +
     '<div class="settings-section"><div class="settings-label">Названия предметов</div><div class="theme-toggle"><button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button><button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button></div></div>' +
-    '<div class="settings-section"><div class="settings-label">Способ запуска</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + launchLabel + '</b></div><button class="btn primary" data-act="changeLaunch" style="width:100%">Изменить</button></div>' +
+    '<div class="settings-section"><div class="settings-label">Браузер для установки</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + launchLabel + '</b></div><button class="btn primary" data-act="changeLaunch" style="width:100%">Изменить</button></div>' +
     '<div class="settings-section"><div class="settings-label">Профиль администратора</div>' + (isAdmin ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>' : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>') + '</div>' +
     '<div class="modal-actions"><button class="btn ghost" data-act="cancel">Закрыть</button></div></div>';
   document.body.appendChild(back);
@@ -640,7 +641,7 @@ function openEditor(lessonId){
 }
 
 /* ============================================================
-   ВЫБОР СПОСОБА ЗАПУСКА
+   ВЫБОР БРАУЗЕРА ДЛЯ УСТАНОВКИ
    ============================================================ */
 function showLaunchChoice(){
   if (document.getElementById('launchChoice')) return;
@@ -648,14 +649,14 @@ function showLaunchChoice(){
   overlay.id = 'launchChoice';
   overlay.innerHTML = '<div class="launch-card">' +
       '<div class="launch-title">Как вы открыли приложение?</div>' +
-      '<div class="launch-sub">Мы подберём удобный способ закрепить его на главном экране</div>' +
-      '<button class="launch-btn" data-launch="telegram">' +
-        '<span class="lb-icon">✈️</span>' +
-        '<span class="lb-text"><span class="lb-title">Через Telegram</span><span class="lb-sub">Открываю через бота</span></span>' +
-      '</button>' +
-      '<button class="launch-btn" data-launch="browser">' +
+      '<div class="launch-sub">Подскажем, как закрепить его на главном экране</div>' +
+      '<button class="launch-btn" data-launch="chrome">' +
         '<span class="lb-icon">🌐</span>' +
-        '<span class="lb-text"><span class="lb-title">Через браузер</span><span class="lb-sub">Открываю ссылку в Safari / Chrome</span></span>' +
+        '<span class="lb-text"><span class="lb-title">Chrome</span><span class="lb-sub">Android или компьютер</span></span>' +
+      '</button>' +
+      '<button class="launch-btn" data-launch="safari">' +
+        '<span class="lb-icon">🧭</span>' +
+        '<span class="lb-text"><span class="lb-title">Safari</span><span class="lb-sub">iPhone или iPad</span></span>' +
       '</button>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -676,12 +677,17 @@ function showLaunchChoice(){
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('[PWA] beforeinstallprompt fired');
   e.preventDefault();
   deferredPrompt = e;
-  if (launchMode === 'browser') showInstallBanner('browser');
+  // Если пользователь уже выбрал браузер — покажем плашку сразу
+  if (launchMode === 'chrome' || launchMode === 'safari'){
+    setTimeout(() => showInstallBanner(launchMode), 300);
+  }
 });
 
 window.addEventListener('appinstalled', () => {
+  console.log('[PWA] appinstalled');
   deferredPrompt = null;
   removeInstallBanner();
   setSync('ok', '✓ приложение установлено');
@@ -692,78 +698,53 @@ function removeInstallBanner(){
   if (b) b.remove();
 }
 
-function isIOS(){
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
-function getTelegramSDK(){
-  return (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true;
 }
 
 function showInstallBanner(mode){
-  console.log('[Install] mode=', mode, 'tg=', !!getTelegramSDK());
+  console.log('[Install] mode=', mode, 'deferredPrompt=', !!deferredPrompt, 'standalone=', isStandalone());
 
-  if (mode === 'telegram'){
-    const tg = getTelegramSDK();
-    if (!tg){
-      // Всё ещё нет SDK. Через 500 мс попробуем ещё раз, потом покажем инструкцию.
-      setTimeout(() => {
-        const tg2 = getTelegramSDK();
-        if (tg2) showInstallBanner('telegram');
-        else showSimpleBanner('✈️', 'Открыть в Telegram',
-          'Чтобы закрепить бота на главном экране, откройте приложение через бота в Telegram.');
-      }, 600);
-      return;
-    }
-    if (typeof tg.addToHomeScreen !== 'function'){
-      showSimpleBanner('✈️', 'Ярлык в Telegram',
-        'Нажмите <b>три точки</b> в правом верхнем углу → <b>Добавить на главный экран</b>.');
-      return;
-    }
-    try {
-      tg.checkHomeScreenStatus(function(status){
-        console.log('[Install] homeScreen status:', status);
-        if (status === 'added') return;
-        showBannerWithAction('📲', 'Добавить на главный экран?',
-          'Быстрый доступ к расписанию в один тап',
-          'Установить',
-          function(){
-            try { tg.addToHomeScreen(); } catch(e){ console.warn(e); }
-          });
-      });
-    } catch(e){
-      showBannerWithAction('📲', 'Добавить на главный экран?',
-        'Быстрый доступ к расписанию в один тап',
-        'Установить',
-        function(){ try { tg.addToHomeScreen(); } catch(e){} });
-    }
+  if (isStandalone()) {
+    // Уже установлено — не показываем
     return;
   }
 
-  if (mode === 'browser'){
+  if (mode === 'chrome'){
     if (deferredPrompt){
-      showBannerWithAction('📲', 'Установить приложение?',
+      // Chrome сам готов предложить установку — показываем свою красивую кнопку
+      showBannerWithAction(
+        '📲',
+        'Установить приложение?',
         'Быстрый доступ с рабочего стола, без браузера',
         'Установить',
         async function(){
           if (!deferredPrompt) return;
           try {
             deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-          } catch(e){}
+            const choice = await deferredPrompt.userChoice;
+            console.log('[PWA] user choice:', choice.outcome);
+            if (choice.outcome === 'accepted'){
+              setSync('ok', '✓ устанавливается…');
+            }
+          } catch(e){ console.warn(e); }
           deferredPrompt = null;
           removeInstallBanner();
-        });
+        }
+      );
       return;
     }
-    if (isIOS()){
-      showSimpleBanner('📲', 'Установить на iPhone',
-        'Нажмите <b>Поделиться</b> внизу экрана → <b>«На экран Домой»</b> → <b>Добавить</b>.');
-      return;
-    }
-    if (window.matchMedia('(display-mode: standalone)').matches) return;
-    showSimpleBanner('🌐', 'Установить как приложение',
-      'Откройте ссылку в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone), чтобы добавить на главный экран.');
+    // Chrome пока не готов предложить установку — показываем инструкцию
+    showSimpleBanner('🌐', 'Установка через Chrome',
+      'Нажмите <b>⋮</b> в правом верхнем углу → <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b>.');
+    return;
+  }
+
+  if (mode === 'safari'){
+    showSimpleBanner('🧭', 'Установка на iPhone/iPad',
+      'Нажмите <b>Поделиться</b> <b style="font-size:15px;">⎙</b> внизу экрана → <b>«На экран Домой»</b> → <b>Добавить</b>.');
+    return;
   }
 }
 
@@ -774,7 +755,7 @@ function showSimpleBanner(icon, title, subHtml){
   banner.innerHTML = '<div class="ib-icon">' + icon + '</div><div class="ib-text"><div class="ib-title">' + title + '</div><div class="ib-sub">' + subHtml + '</div></div><button class="ib-close" id="ibClose">✕</button>';
   document.body.appendChild(banner);
   banner.querySelector('#ibClose').onclick = () => banner.remove();
-  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 25000);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 30000);
 }
 
 function showBannerWithAction(icon, title, sub, btnLabel, action){
@@ -785,7 +766,7 @@ function showBannerWithAction(icon, title, sub, btnLabel, action){
   document.body.appendChild(banner);
   banner.querySelector('#ibDo').onclick = action;
   banner.querySelector('#ibClose').onclick = () => banner.remove();
-  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 25000);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 30000);
 }
 
 /* ============================================================
@@ -803,14 +784,16 @@ if ('serviceWorker' in navigator){
   });
 }
 
-// Ждём загрузки SDK Telegram перед показом диалога
-const tgSDK = getTelegramSDK();
+// Telegram SDK — ready/expand, но без логики ярлыка
+const tgSDK = window.Telegram && window.Telegram.WebApp;
 if (tgSDK){
   tgSDK.ready && tgSDK.ready();
   tgSDK.expand && tgSDK.expand();
 }
 
+// Первый запуск: показать диалог выбора браузера
 setTimeout(() => {
+  if (isStandalone()) return; // уже установлено — не мешаем
   if (launchMode === null){
     showLaunchChoice();
   } else {
