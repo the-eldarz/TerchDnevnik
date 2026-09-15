@@ -14,12 +14,20 @@
   --accent:#3d6dff; --accent-soft:#e8efff; --border:#e4e8ef;
   --danger:#e5484d; --radius:16px;
   --hw-bg:linear-gradient(135deg,#eef4ff 0%,#f7faff 100%);
+  --pending:#f59e0b;
+  --pending-bg:linear-gradient(135deg,#fff8ec 0%,#fffdf7 100%);
+  --pending-soft:#fff4dd;
+  --pending-text:#7a4a00;
 }
 [data-theme="dark"]{
   --bg:#0f1116; --card:#1a1d24; --text:#e6e9ef; --muted:#8a92a3;
   --accent:#5b83ff; --accent-soft:#1b2540; --border:#262b36;
   --danger:#ff6b6e;
   --hw-bg:linear-gradient(135deg,#1c2745 0%,#161c30 100%);
+  --pending:#ffb84d;
+  --pending-bg:linear-gradient(135deg,#2a2213 0%,#1f1a10 100%);
+  --pending-soft:#2a2213;
+  --pending-text:#ffcc7a;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;margin:0;}
@@ -48,6 +56,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .lessons{display:flex;flex-direction:column;gap:10px;}
 .lesson{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 3px rgba(20,30,50,.06);border-left:3px solid transparent;padding:14px;cursor:pointer;transition:box-shadow .15s,background .2s ease;}
 .lesson.has-hw{border-left-color:var(--accent);}
+.lesson.has-pending{border-left-color:var(--pending);}
 .lesson.expanded{box-shadow:0 4px 14px rgba(20,30,50,.09);}
 .lesson-row{display:flex;gap:12px;align-items:flex-start;}
 .time-col{flex:0 0 60px;display:flex;flex-direction:column;align-items:center;gap:1px;}
@@ -67,23 +76,48 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .detail-value.teacher{font-weight:500;}
 .no-hw{color:var(--muted);font-style:italic;font-size:13.5px;}
 .no-teacher{color:var(--muted);font-style:italic;font-size:13.5px;}
+
+/* Одобренное ДЗ */
 .hw-display{position:relative;background:var(--hw-bg);border:1.5px solid var(--accent);border-left-width:5px;border-radius:12px;padding:13px 14px 13px 15px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;color:var(--text);box-shadow:0 2px 10px rgba(61,109,255,.10);}
 .hw-display::before{content:'ДЗ';display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
+
+/* ДЗ на проверке (у админа) */
+.hw-pending{position:relative;background:var(--pending-bg);border:1.5px solid var(--pending);border-left-width:5px;border-radius:12px;padding:12px 14px 12px 15px;font-size:14px;line-height:1.5;color:var(--text);box-shadow:0 2px 10px rgba(245,158,11,.14);margin-top:8px;}
+.hw-pending:first-child{margin-top:0;}
+.hw-pending-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:12px;color:var(--pending-text);font-weight:700;}
+.hw-pending-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--pending);color:#fff;border-radius:50%;font-size:12px;font-weight:800;line-height:1;flex:0 0 auto;}
+.hw-pending-text{white-space:pre-wrap;word-break:break-word;font-size:14.5px;color:var(--text);}
+.hw-pending-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.hw-pending-actions button{flex:1;min-width:100px;padding:9px 12px;border-radius:9px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.hw-pending-actions .approve{background:#16a34a;color:#fff;}
+.hw-pending-actions .approve:active{opacity:.85;}
+.hw-pending-actions .reject{background:var(--bg);color:var(--danger);}
+
+/* У пользователя своё pending */
+.hw-user-pending{position:relative;background:var(--pending-bg);border:1.5px dashed var(--pending);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);}
+.hw-user-pending-label{display:inline-block;background:var(--pending);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
+.hw-user-pending .hint2{font-size:11.5px;color:var(--pending-text);margin-top:6px;}
+
+/* Ряд ДЗ + карандаш */
 .hw-view-row{display:flex;gap:10px;align-items:flex-start;}
 .hw-view-row .hw-display{flex:1;min-width:0;}
 .hw-view-row .no-hw{flex:1;min-width:0;display:flex;align-items:center;min-height:42px;padding:0 4px;}
 .pencil-btn{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);border:none;font-size:17px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:transform .15s ease,background .15s ease;}
 .pencil-btn:active{transform:scale(.92);background:var(--accent);color:#fff;}
+
 .hw-edit{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:11px;font-size:14.5px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:60px;}
 .hw-edit:focus{border-color:var(--accent);background:var(--card);}
 .hw-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .save-hw{padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .save-hw:active{opacity:.85;}
+.submit-hw{padding:9px 16px;border-radius:10px;border:none;background:var(--pending);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
+.submit-hw:active{opacity:.85;}
 .delete-hw{padding:9px 16px;border-radius:10px;border:none;background:rgba(229,72,77,.12);color:var(--danger);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .delete-hw:active{opacity:.8;}
 .cancel-hw{padding:9px 16px;border-radius:10px;border:none;background:var(--bg);color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .cancel-hw:active{opacity:.75;}
 .btn-edit-lesson{margin-top:8px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;font-family:inherit;}
+
 .empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:15px;}
 .empty .big{font-size:34px;display:block;margin-bottom:10px;}
 .add-btn{margin-top:14px;width:100%;padding:13px;border-radius:14px;border:1.5px dashed var(--accent);background:transparent;color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
@@ -144,8 +178,6 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .sync-badge.ok{color:#16a34a;}
 .sync-badge.err{color:var(--danger);}
 .sync-badge.sync{color:var(--accent);}
-
-/* Диалог выбора браузера */
 #launchChoice{position:fixed;inset:0;background:rgba(15,20,30,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;animation:fadeBg .25s ease;}
 .launch-card{background:var(--card);color:var(--text);border-radius:22px;padding:26px 22px 22px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .3s cubic-bezier(.2,.9,.3,1);}
 .launch-title{font-size:20px;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:-.3px;}
@@ -157,58 +189,24 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .launch-btn .lb-text{flex:1;min-width:0;}
 .launch-btn .lb-title{font-weight:700;font-size:15px;display:block;margin-bottom:2px;}
 .launch-btn .lb-sub{font-size:12px;color:var(--muted);display:block;line-height:1.3;}
-
-/* Плашка установки */
-#installBanner{
-  position:fixed;left:12px;right:12px;
-  bottom:calc(70px + env(safe-area-inset-bottom));
-  background:var(--card);color:var(--text);
-  border-radius:16px;
-  box-shadow:0 6px 24px rgba(0,0,0,.22);
-  padding:14px 14px 12px;
-  display:flex;align-items:flex-start;gap:10px;
-  z-index:200;
-  animation:hsSlideUp .35s cubic-bezier(.2,.9,.3,1);
-  border:1px solid var(--border);
-}
+#installBanner{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--card);color:var(--text);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.22);padding:14px 14px 12px;display:flex;align-items:flex-start;gap:10px;z-index:200;animation:hsSlideUp .35s cubic-bezier(.2,.9,.3,1);border:1px solid var(--border);}
 @keyframes hsSlideUp{from{transform:translateY(80px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 #installBanner .ib-icon{font-size:24px;flex:0 0 auto;line-height:1.1;padding-top:2px;}
 #installBanner .ib-text{flex:1;min-width:0;}
 #installBanner .ib-title{font-weight:700;font-size:15px;margin-bottom:3px;}
 #installBanner .ib-sub{font-size:12.5px;color:var(--muted);line-height:1.4;margin-bottom:10px;}
 #installBanner .ib-actions{display:flex;gap:8px;flex-wrap:wrap;}
-#installBanner .ib-btn{
-  flex:1;min-width:100px;
-  padding:10px 14px;border-radius:10px;border:none;
-  font-size:13.5px;font-weight:700;font-family:inherit;
-  cursor:pointer;transition:opacity .15s ease;
-}
+#installBanner .ib-btn{flex:1;min-width:100px;padding:10px 14px;border-radius:10px;border:none;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .15s ease;}
 #installBanner .ib-btn:active{opacity:.8;}
 #installBanner .ib-btn.primary{background:var(--accent);color:#fff;}
 #installBanner .ib-btn.ghost{background:var(--bg);color:var(--muted);}
-#installBanner .ib-close{
-  flex:0 0 auto;background:transparent;border:none;
-  color:var(--muted);font-size:18px;cursor:pointer;
-  padding:0 4px;font-family:inherit;align-self:flex-start;
-  line-height:1.1;
-}
-
+#installBanner .ib-close{flex:0 0 auto;background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px;font-family:inherit;align-self:flex-start;line-height:1.1;}
 .help-steps{font-size:14px;line-height:1.6;color:var(--text);}
 .help-steps ol{padding-left:22px;margin:10px 0;}
 .help-steps li{margin-bottom:8px;}
-.help-steps code{
-  display:inline-block;
-  background:var(--bg);color:var(--accent);
-  padding:2px 7px;border-radius:6px;
-  font-size:12.5px;word-break:break-all;
-  font-family:ui-monospace,Menlo,Consolas,monospace;
-}
+.help-steps code{display:inline-block;background:var(--bg);color:var(--accent);padding:2px 7px;border-radius:6px;font-size:12.5px;word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;}
 .help-steps b{color:var(--accent);}
-.help-note{
-  background:var(--accent-soft);color:var(--accent);
-  padding:10px 12px;border-radius:10px;
-  font-size:12.5px;line-height:1.45;margin-top:12px;
-}
+.help-note{background:var(--accent-soft);color:var(--accent);padding:10px 12px;border-radius:10px;font-size:12.5px;line-height:1.45;margin-top:12px;}
 </style>
 </head>
 <body>
@@ -236,7 +234,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 18;
+const VERSION    = 19;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
@@ -262,7 +260,7 @@ const RULES = [
   { keys:['русс','литератур'], room:'5', teacher:'Бориева Лариса Борисовна' },
   { keys:['физик'], room:'6', teacher:'Бычихина Наталья Александровна' },
   { keys:['географ'], room:'14', teacher:'Мукова Арина Борисовна' },
-  { keys:['англ','анг.'], room:'21', teacher:'Срухова Оксана Руслановна' },
+  { keys:['англ','анг.'], teacher:'Срухова Оксана Руслановна', roomByDow:{ 0:'21', 1:'44', 3:'19' }, room:'21' },
   { keys:['матем','алгебр','геометр','вероятн','информатик','разг'], room:'15', teacher:'Кушхова Асият Олеговна' },
   { keys:['обзр','обж'], room:'16', teacher:'Шарибов Сергей (Хамиша) Саутиевич' },
   { keys:['физ-ра','физра'], room:'Спортзал', teacher:'Шомахов Рустам Русланович' },
@@ -297,11 +295,36 @@ const store = {
 })();
 
 let schedule = store.get('schedule', DEFAULT_SCHEDULE);
-let homework = store.get('homework', {});
 let isAdmin = store.get('admin', false);
 let currentTheme = store.get('theme', 'light');
 let shortNames = store.get('shortNames', true);
 let browserChoice = store.get('browserChoice', null);
+
+// Структура ДЗ: { approved: { '2026-09-13': { lessonId: 'текст' } }, pending: { '2026-09-13': { lessonId: [ {id, text, name, ts, anonId} ] } } }
+let homework = { approved: {}, pending: {} };
+
+/* ID текущего пользователя (для отслеживания своих pending) */
+function getAnonId(){
+  let id = localStorage.getItem('sched_anonId');
+  if (!id){
+    id = 'u_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    localStorage.setItem('sched_anonId', id);
+  }
+  return id;
+}
+const MY_ID = getAnonId();
+
+function askUserName(){
+  let name = (localStorage.getItem('sched_userName') || '').trim();
+  if (name) return name;
+  let input = prompt('Как вас зовут? Имя будет видно администратору рядом с вашим ДЗ.', '');
+  input = (input || '').trim().slice(0, 40);
+  if (input){
+    localStorage.setItem('sched_userName', input);
+    return input;
+  }
+  return 'Аноним';
+}
 
 function applyTheme(theme){
   currentTheme = theme;
@@ -327,6 +350,21 @@ function setSync(state, text){
   }
 }
 
+/* Нормализация формата: поддержка старого (плоский объект) и нового (approved/pending) */
+function normalizeHomework(data){
+  if (!data || typeof data !== 'object' || Array.isArray(data)){
+    return { approved: {}, pending: {} };
+  }
+  if (data.approved !== undefined || data.pending !== undefined){
+    return {
+      approved: (data.approved && typeof data.approved === 'object') ? data.approved : {},
+      pending:  (data.pending  && typeof data.pending  === 'object') ? data.pending  : {}
+    };
+  }
+  // старый формат: { '2026-09-13': { lessonId: 'text' } }
+  return { approved: data, pending: {} };
+}
+
 async function loadHomeworkFromServer(){
   setSync('sync', '↻');
   try {
@@ -334,11 +372,16 @@ async function loadHomeworkFromServer(){
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const record = data && data.record;
-    if (record && typeof record === 'object' && !Array.isArray(record)){
-      if (Object.keys(record).length === 1 && record.test !== undefined) homework = {};
-      else homework = record;
-      store.set('homework', homework);
-    } else { homework = {}; }
+    if (record && typeof record === 'object'){
+      // Если bin содержал тестовый { test: 1 } — обнуляем
+      if (Object.keys(record).length === 1 && record.test !== undefined){
+        homework = { approved: {}, pending: {} };
+      } else {
+        homework = normalizeHomework(record);
+      }
+    } else {
+      homework = { approved: {}, pending: {} };
+    }
     setSync('ok', '✓ синхронизировано');
     return true;
   } catch (e) { console.warn(e); setSync('err', '⚠ оффлайн'); return false; }
@@ -347,12 +390,10 @@ async function loadHomeworkFromServer(){
 async function saveHomeworkToServer(){
   setSync('sync', '↻');
   try {
-    let toSave = homework;
-    if (Object.keys(toSave).length === 1 && toSave.test !== undefined) toSave = {};
     const r = await fetch(JSONBIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
-      body: JSON.stringify(toSave)
+      body: JSON.stringify(homework)
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     setSync('ok', '✓ сохранено');
@@ -399,7 +440,56 @@ function getTeacher(lesson){
   return '';
 }
 
-const state = { view:'day', date:new Date(), expandedId:null, editingHwId:null };
+/* Доступ к ДЗ конкретного дня/урока */
+function getApproved(ds, lessonId){
+  const day = homework.approved && homework.approved[ds];
+  return (day && day[lessonId]) || '';
+}
+function getPendingList(ds, lessonId){
+  const day = homework.pending && homework.pending[ds];
+  if (!day || !day[lessonId]) return [];
+  return Array.isArray(day[lessonId]) ? day[lessonId] : [];
+}
+function setApproved(ds, lessonId, text){
+  if (!homework.approved) homework.approved = {};
+  if (!homework.approved[ds]) homework.approved[ds] = {};
+  const clean = String(text || '').trim();
+  if (clean) homework.approved[ds][lessonId] = clean;
+  else delete homework.approved[ds][lessonId];
+  if (!Object.keys(homework.approved[ds]).length) delete homework.approved[ds];
+}
+function addPending(ds, lessonId, text, name){
+  if (!homework.pending) homework.pending = {};
+  if (!homework.pending[ds]) homework.pending[ds] = {};
+  if (!homework.pending[ds][lessonId]) homework.pending[ds][lessonId] = [];
+  // Убираем старую заявку этого же пользователя (перезапись)
+  homework.pending[ds][lessonId] = homework.pending[ds][lessonId].filter(p => p.anonId !== MY_ID);
+  homework.pending[ds][lessonId].push({
+    id: 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    text: String(text || '').trim(),
+    name: name || 'Аноним',
+    anonId: MY_ID,
+    ts: Date.now()
+  });
+}
+function removePending(ds, lessonId, pendingId){
+  if (!homework.pending || !homework.pending[ds]) return;
+  const day = homework.pending[ds];
+  if (!day[lessonId]) return;
+  day[lessonId] = day[lessonId].filter(p => p.id !== pendingId);
+  if (!day[lessonId].length) delete day[lessonId];
+  if (!Object.keys(day).length) delete homework.pending[ds];
+}
+function removeAllPendingForLesson(ds, lessonId){
+  if (!homework.pending || !homework.pending[ds]) return;
+  delete homework.pending[ds][lessonId];
+  if (!Object.keys(homework.pending[ds]).length) delete homework.pending[ds];
+}
+function getMyPending(ds, lessonId){
+  return getPendingList(ds, lessonId).find(p => p.anonId === MY_ID) || null;
+}
+
+const state = { view:'day', date:new Date(), expandedId:null, editingHwId:null, editingMode:null };
 
 function render(opts){
   opts = opts || {};
@@ -423,31 +513,150 @@ function updateNavLabel(){
 
 function renderDay(){
   const d = state.date, di = dowIndex(d), ds = ymd(d);
-  const lessons = sortLessons(schedule[di] || []);
-  const hw = homework[ds] || {};
+  const lessons = sortLessons(schedule[di] || {});
+
   let html = '<div class="day-head"><div class="dow">' + DOW_FULL[di] + (isToday(d) ? '<span class="badge-today">сегодня</span>' : '') + '</div><div class="date">' + d.getDate() + ' ' + MONTHS_GEN[d.getMonth()] + ' ' + d.getFullYear() + '</div></div>';
-  if (!lessons.length){ html += '<div class="empty"><span class="big">🎉</span>Занятий нет</div>'; }
-  else {
+
+  if (!lessons.length){
+    html += '<div class="empty"><span class="big">🎉</span>Занятий нет</div>';
+  } else {
     html += '<div class="lessons">';
     lessons.forEach((l, i) => {
-      const hwText = hw[l.id] || '';
+      const approvedText = getApproved(ds, l.id);
+      const pendingList = getPendingList(ds, l.id);
+      const myPending = getMyPending(ds, l.id);
+      const hasPending = pendingList.length > 0;
       const room = getRoom(l, di), teacher = getTeacher(l);
       const expanded = state.expandedId === l.id;
-      const editing = state.editingHwId === l.id;
-      let hwBlock;
-      if (isAdmin && editing){
-        hwBlock = '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' + esc(hwText) + '</textarea><div class="hw-actions"><button class="save-hw" data-save="' + esc(l.id) + '">Сохранить</button>' + (hwText ? '<button class="delete-hw" data-delete-hw="' + esc(l.id) + '">Удалить</button>' : '') + '<button class="cancel-hw" data-cancel-hw="' + esc(l.id) + '">Отмена</button></div>';
-      } else if (isAdmin){
-        hwBlock = '<div class="hw-view-row">' + (hwText ? '<div class="hw-display">' + esc(hwText) + '</div>' : '<div class="no-hw">Домашнее задание не задано</div>') + '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" title="Изменить ДЗ">✎</button></div>';
-      } else {
-        hwBlock = hwText ? '<div class="hw-display">' + esc(hwText) + '</div>' : '<div class="no-hw">Домашнее задание не задано</div>';
+      const editing = state.editingHwId === l.id && state.editingMode;
+      const editingApproved = editing && state.editingMode === 'approved';
+      const editingPending  = editing && state.editingMode === 'pending';
+
+      let hwBlock = '';
+
+      /* ===== Режим редактирования ===== */
+      if (editingApproved && isAdmin){
+        hwBlock =
+          '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' + esc(approvedText) + '</textarea>' +
+          '<div class="hw-actions">' +
+            '<button class="save-hw" data-save="' + esc(l.id) + '">Сохранить</button>' +
+            (approvedText ? '<button class="delete-hw" data-delete-hw="' + esc(l.id) + '">Удалить</button>' : '') +
+            '<button class="cancel-hw" data-cancel-hw="1">Отмена</button>' +
+          '</div>';
+      } else if (editingPending && !isAdmin){
+        const prefilled = myPending ? myPending.text : '';
+        hwBlock =
+          '<div class="hw-pending-head" style="margin-bottom:8px;"><span class="hw-pending-icon">?</span>Ваше предложение</div>' +
+          '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Введите текст ДЗ...">' + esc(prefilled) + '</textarea>' +
+          '<div class="hw-actions">' +
+            '<button class="submit-hw" data-submit-hw="' + esc(l.id) + '">Отправить на проверку</button>' +
+            (myPending ? '<button class="delete-hw" data-cancel-pending="' + esc(l.id) + '">Отменить заявку</button>' : '') +
+            '<button class="cancel-hw" data-cancel-hw="1">Закрыть</button>' +
+          '</div>';
       }
-      html += '<div class="lesson' + (hwText ? ' has-hw' : '') + (expanded ? ' expanded' : '') + '" data-lesson="' + esc(l.id) + '"><div class="lesson-row"><div class="time-col"><div class="time">' + esc(l.time) + '</div><div class="num">' + (i+1) + '</div></div><div class="info"><div class="subject">' + esc(displaySubject(l.subject)) + '</div></div><div class="chev">›</div></div><div class="details"><div class="detail-row"><div class="detail-label">Преподаватель</div>' + (teacher ? '<div class="detail-value teacher">' + esc(teacher) + '</div>' : '<div class="no-teacher">не указан</div>') + '</div><div class="detail-row"><div class="detail-label">Кабинет</div><div class="detail-value room">' + (room ? (room === 'Спортзал' ? esc(room) : 'каб. ' + esc(room)) : 'не указан') + '</div></div><div class="detail-row"><div class="detail-label">Домашнее задание</div>' + hwBlock + '</div>' + (isAdmin ? '<button class="btn-edit-lesson" data-edit="' + esc(l.id) + '">Изменить занятие</button>' : '') + '</div></div>';
+      /* ===== Режим просмотра ===== */
+      else if (isAdmin){
+        // У админа: approved + все pending + карандаш
+        let inner = '';
+        // Все pending — оранжевые рамки
+        pendingList.forEach(p => {
+          inner +=
+            '<div class="hw-pending">' +
+              '<div class="hw-pending-head"><span class="hw-pending-icon">!</span>Предложено: <b>' + esc(p.name) + '</b></div>' +
+              '<div class="hw-pending-text">' + esc(p.text) + '</div>' +
+              '<div class="hw-pending-actions">' +
+                '<button class="approve" data-approve="' + esc(l.id) + '" data-pending-id="' + esc(p.id) + '">✓ Одобрить</button>' +
+                '<button class="reject" data-reject="' + esc(l.id) + '" data-pending-id="' + esc(p.id) + '">✕ Отклонить</button>' +
+              '</div>' +
+            '</div>';
+        });
+        // Approved
+        if (approvedText){
+          inner +=
+            '<div class="hw-view-row" style="margin-top:' + (pendingList.length ? '10px' : '0') + ';">' +
+              '<div class="hw-display">' + esc(approvedText) + '</div>' +
+              '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" data-mode="approved" title="Изменить ДЗ">✎</button>' +
+            '</div>';
+        } else if (!pendingList.length){
+          inner =
+            '<div class="hw-view-row">' +
+              '<div class="no-hw">Домашнее задание не задано</div>' +
+              '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" data-mode="approved" title="Добавить ДЗ">✎</button>' +
+            '</div>';
+        } else {
+          // Есть pending, approved нет — оставляем карандаш для добавления своего
+          inner +=
+            '<div class="hw-view-row" style="margin-top:10px;">' +
+              '<div class="no-hw">Своё ДЗ (одобренное) не задано</div>' +
+              '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" data-mode="approved" title="Добавить ДЗ">✎</button>' +
+            '</div>';
+        }
+        hwBlock = inner;
+      } else {
+        // Обычный пользователь
+        let inner = '';
+        if (approvedText){
+          inner += '<div class="hw-display">' + esc(approvedText) + '</div>';
+        }
+        if (myPending){
+          if (approvedText) inner += '<div style="height:8px;"></div>';
+          inner +=
+            '<div class="hw-user-pending">' +
+              '<span class="hw-user-pending-label">НА ПРОВЕРКЕ</span>' + esc(myPending.text) +
+              '<div class="hint2">Ждём одобрения администратора</div>' +
+            '</div>';
+        }
+        if (!approvedText && !myPending){
+          inner += '<div class="no-hw">Домашнее задание не задано</div>';
+        }
+        hwBlock =
+          '<div class="hw-view-row">' +
+            '<div style="flex:1;min-width:0;">' + inner + '</div>' +
+            '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" data-mode="pending" title="Предложить ДЗ">✎</button>' +
+          '</div>';
+      }
+
+      html +=
+        '<div class="lesson' +
+          (approvedText ? ' has-hw' : '') +
+          (hasPending && isAdmin ? ' has-pending' : '') +
+          (expanded ? ' expanded' : '') +
+        '" data-lesson="' + esc(l.id) + '">' +
+          '<div class="lesson-row">' +
+            '<div class="time-col">' +
+              '<div class="time">' + esc(l.time) + '</div>' +
+              '<div class="num">' + (i+1) + '</div>' +
+            '</div>' +
+            '<div class="info">' +
+              '<div class="subject">' + esc(displaySubject(l.subject)) + '</div>' +
+            '</div>' +
+            '<div class="chev">›</div>' +
+          '</div>' +
+          '<div class="details">' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Преподаватель</div>' +
+              (teacher ? '<div class="detail-value teacher">' + esc(teacher) + '</div>' : '<div class="no-teacher">не указан</div>') +
+            '</div>' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Кабинет</div>' +
+              '<div class="detail-value room">' +
+                (room ? (room === 'Спортзал' ? esc(room) : 'каб. ' + esc(room)) : 'не указан') +
+              '</div>' +
+            '</div>' +
+            '<div class="detail-row">' +
+              '<div class="detail-label">Домашнее задание</div>' +
+              hwBlock +
+            '</div>' +
+            (isAdmin ? '<button class="btn-edit-lesson" data-edit="' + esc(l.id) + '">Изменить занятие</button>' : '') +
+          '</div>' +
+        '</div>';
     });
     html += '</div>';
   }
-  if (isAdmin) html += '<button class="add-btn" id="addLesson">+ Добавить занятие</button><div class="hint">Нажмите на занятие, чтобы развернуть данные.<br>Карандаш ✎ рядом с ДЗ — редактирование домашнего задания.</div>';
-  else html += '<div class="hint">Нажмите на занятие, чтобы увидеть преподавателя, кабинет и домашнее задание.</div>';
+
+  if (isAdmin) html += '<button class="add-btn" id="addLesson">+ Добавить занятие</button><div class="hint">Оранжевые рамки — предложения от пользователей. Одобрите их, чтобы ДЗ увидели все.</div>';
+  else html += '<div class="hint">Нажмите на занятие, чтобы посмотреть ДЗ. Карандаш ✎ — предложить своё ДЗ.</div>';
+
   content.innerHTML = html;
 }
 
@@ -457,10 +666,15 @@ function renderWeek(){
   for (let i = 0; i < 7; i++){
     const date = addDays(mon, i), ds = ymd(date);
     const lessons = sortLessons(schedule[i] || []);
-    const hw = homework[ds] || {};
     html += '<div class="week-day' + (isToday(date) ? ' today' : '') + '" data-date="' + ds + '"><div class="wd-head"><span class="wd-name">' + DOW_SHORT[i] + '</span><span class="wd-date">' + date.getDate() + '.' + String(date.getMonth()+1).padStart(2,'0') + '</span></div>';
-    if (lessons.length){ lessons.forEach(l => { html += '<div class="wd-lesson"><b>' + esc(l.time) + '</b><span class="sub">' + esc(displaySubject(l.subject)) + '</span>' + (hw[l.id] ? '<span class="mark">📝</span>' : '') + '</div>'; }); }
-    else html += '<span class="wd-empty">нет занятий</span>';
+    if (lessons.length){
+      lessons.forEach(l => {
+        const hasApproved = !!getApproved(ds, l.id);
+        const hasPending = getPendingList(ds, l.id).length > 0;
+        html += '<div class="wd-lesson"><b>' + esc(l.time) + '</b><span class="sub">' + esc(displaySubject(l.subject)) + '</span>' +
+                (hasApproved ? '<span class="mark">📝</span>' : (hasPending && isAdmin ? '<span class="mark" style="color:#f59e0b;">!</span>' : '')) + '</div>';
+      });
+    } else html += '<span class="wd-empty">нет занятий</span>';
     html += '</div>';
   }
   html += '</div>';
@@ -477,17 +691,23 @@ function renderMonth(){
   for (let day = 1; day <= daysInMonth; day++){
     const date = new Date(year, month, day), ds = ymd(date), di = dowIndex(date);
     const hasLessons = (schedule[di] || []).length > 0;
-    const hwObj = homework[ds] || {};
-    const hasHw = Object.keys(hwObj).some(k => hwObj[k] && hwObj[k].trim());
-    html += '<div class="cell' + (ds === todayStr ? ' today' : '') + (ds === selStr ? ' sel' : '') + '" data-date="' + ds + '"><div class="dnum">' + day + '</div><div class="dots">' + (hasLessons ? '<span class="dot lesson-dot"></span>' : '') + (hasHw ? '<span class="dot hw-dot"></span>' : '') + '</div></div>';
+    const approvedObj = homework.approved[ds] || {};
+    const pendingObj = homework.pending[ds] || {};
+    const hasHw = Object.keys(approvedObj).some(k => approvedObj[k] && approvedObj[k].trim());
+    const hasPending = Object.values(pendingObj).some(v => Array.isArray(v) && v.length);
+    html += '<div class="cell' + (ds === todayStr ? ' today' : '') + (ds === selStr ? ' sel' : '') + '" data-date="' + ds + '"><div class="dnum">' + day + '</div><div class="dots">' +
+            (hasLessons ? '<span class="dot lesson-dot"></span>' : '') +
+            (hasHw ? '<span class="dot hw-dot"></span>' : '') +
+            (hasPending && isAdmin ? '<span class="dot" style="background:#f59e0b;"></span>' : '') +
+            '</div></div>';
   }
-  html += '</div><div class="legend"><span><span class="dot lesson-dot"></span>занятия</span><span><span class="dot hw-dot"></span>есть ДЗ</span></div>';
+  html += '</div><div class="legend"><span><span class="dot lesson-dot"></span>занятия</span><span><span class="dot hw-dot"></span>есть ДЗ</span>' + (isAdmin ? '<span><span class="dot" style="background:#f59e0b;"></span>на проверке</span>' : '') + '</div>';
   content.innerHTML = html;
 }
 
 let animating = false;
 function applyShift(delta){
-  state.expandedId = null; state.editingHwId = null;
+  state.expandedId = null; state.editingHwId = null; state.editingMode = null;
   if (state.view === 'day') state.date = addDays(state.date, delta);
   else if (state.view === 'week') state.date = addDays(state.date, delta * 7);
   else { const x = new Date(state.date); x.setDate(1); x.setMonth(x.getMonth() + delta); state.date = x; }
@@ -496,8 +716,8 @@ function shiftNoAnim(delta){ if (animating) return; applyShift(delta); render();
 
 $('prevBtn').onclick = () => shiftNoAnim(-1);
 $('nextBtn').onclick = () => shiftNoAnim(1);
-$('todayBtn').onclick = () => { if (animating) return; state.date = new Date(); state.expandedId = null; state.editingHwId = null; render(); main.scrollTop = 0; };
-document.querySelectorAll('.bottom button').forEach(btn => { btn.onclick = () => { if (animating) return; state.view = btn.dataset.view; state.expandedId = null; state.editingHwId = null; document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b === btn)); render(); main.scrollTop = 0; }; });
+$('todayBtn').onclick = () => { if (animating) return; state.date = new Date(); state.expandedId = null; state.editingHwId = null; state.editingMode = null; render(); main.scrollTop = 0; };
+document.querySelectorAll('.bottom button').forEach(btn => { btn.onclick = () => { if (animating) return; state.view = btn.dataset.view; state.expandedId = null; state.editingHwId = null; state.editingMode = null; document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b === btn)); render(); main.scrollTop = 0; }; });
 
 let startX = 0, startY = 0, curDx = 0, dragging = false, dirLocked = null;
 main.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; if (animating) return; if (document.querySelector('.modal-back')) return; startX = e.touches[0].clientX; startY = e.touches[0].clientY; curDx = 0; dragging = false; dirLocked = null; }, {passive:true});
@@ -543,59 +763,158 @@ function finishSwipe(direction){
 
 document.addEventListener('keydown', e => { if (document.querySelector('.modal-back')) return; if (e.key === 'ArrowLeft') shiftNoAnim(-1); if (e.key === 'ArrowRight') shiftNoAnim(1); });
 
+/* ============================================================
+   ОБРАБОТЧИК КЛИКОВ
+   ============================================================ */
 content.addEventListener('click', async e => {
+  const ds = ymd(state.date);
+
+  /* --- Карандаш: открыть редактор --- */
   const pencilBtn = e.target.closest('[data-edit-hw]');
-  if (pencilBtn && isAdmin){
-    state.editingHwId = pencilBtn.dataset.editHw;
+  if (pencilBtn){
+    const lessonId = pencilBtn.dataset.editHw;
+    const mode = pencilBtn.dataset.mode || (isAdmin ? 'approved' : 'pending');
+    // Обычный пользователь не может редактировать approved
+    if (mode === 'approved' && !isAdmin) return;
+    if (mode === 'pending' && isAdmin) return;
+
+    if (mode === 'pending'){
+      // Спросить имя перед первой отправкой
+      askUserName();
+    }
+
+    state.editingHwId = lessonId;
+    state.editingMode = mode;
     render({skipFade:true});
     setTimeout(() => {
-      const ta = content.querySelector('[data-hw-for="' + state.editingHwId + '"]');
+      const ta = content.querySelector('[data-hw-for="' + lessonId + '"]');
       if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
     }, 80);
     return;
   }
+
+  /* --- Отмена редактирования --- */
   const cancelBtn = e.target.closest('[data-cancel-hw]');
-  if (cancelBtn && isAdmin){ state.editingHwId = null; render({skipFade:true}); return; }
+  if (cancelBtn){
+    state.editingHwId = null; state.editingMode = null;
+    render({skipFade:true});
+    return;
+  }
+
+  /* --- Админ: сохранить approved --- */
   const saveBtn = e.target.closest('[data-save]');
   if (saveBtn && isAdmin){
     const lessonId = saveBtn.dataset.save;
     const ta = content.querySelector('[data-hw-for="' + lessonId + '"]');
     if (ta){
-      const ds = ymd(state.date), val = ta.value.trim();
-      if (!homework[ds]) homework[ds] = {};
-      if (val) homework[ds][lessonId] = val; else delete homework[ds][lessonId];
-      if (!Object.keys(homework[ds]).length) delete homework[ds];
-      store.set('homework', homework); state.editingHwId = null; render({skipFade:true});
+      setApproved(ds, lessonId, ta.value);
+      state.editingHwId = null; state.editingMode = null;
+      render({skipFade:true});
       const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить в облако.');
     }
     return;
   }
+
+  /* --- Админ: удалить approved --- */
   const delHw = e.target.closest('[data-delete-hw]');
   if (delHw && isAdmin){
     const lessonId = delHw.dataset.deleteHw;
     if (!confirm('Удалить домашнее задание для этого занятия?')) return;
-    const ds = ymd(state.date);
-    if (homework[ds]){ delete homework[ds][lessonId]; if (!Object.keys(homework[ds]).length) delete homework[ds]; }
-    store.set('homework', homework); state.editingHwId = null; render({skipFade:true});
+    setApproved(ds, lessonId, '');
+    state.editingHwId = null; state.editingMode = null;
+    render({skipFade:true});
     const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить.');
     return;
   }
+
+  /* --- Пользователь: отправить pending --- */
+  const submitBtn = e.target.closest('[data-submit-hw]');
+  if (submitBtn && !isAdmin){
+    const lessonId = submitBtn.dataset.submitHw;
+    const ta = content.querySelector('[data-hw-for="' + lessonId + '"]');
+    if (ta){
+      const val = ta.value.trim();
+      if (!val){ alert('Введите текст домашнего задания'); return; }
+      const name = askUserName();
+      addPending(ds, lessonId, val, name);
+      state.editingHwId = null; state.editingMode = null;
+      render({skipFade:true});
+      const ok = await saveHomeworkToServer();
+      if (!ok) alert('Не удалось отправить на проверку. Проверьте интернет.');
+    }
+    return;
+  }
+
+  /* --- Пользователь: отменить свою заявку --- */
+  const cancelPendingBtn = e.target.closest('[data-cancel-pending]');
+  if (cancelPendingBtn && !isAdmin){
+    const lessonId = cancelPendingBtn.dataset.cancelPending;
+    const my = getMyPending(ds, lessonId);
+    if (my && confirm('Отменить вашу заявку на это ДЗ?')){
+      removePending(ds, lessonId, my.id);
+      state.editingHwId = null; state.editingMode = null;
+      render({skipFade:true});
+      const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось отменить.');
+    }
+    return;
+  }
+
+  /* --- Админ: одобрить pending --- */
+  const approveBtn = e.target.closest('[data-approve]');
+  if (approveBtn && isAdmin){
+    const lessonId = approveBtn.dataset.approve;
+    const pendingId = approveBtn.dataset.pendingId;
+    const list = getPendingList(ds, lessonId);
+    const item = list.find(p => p.id === pendingId);
+    if (!item) return;
+    // Переносим текст в approved, чистим все pending на этот урок
+    setApproved(ds, lessonId, item.text);
+    removeAllPendingForLesson(ds, lessonId);
+    state.editingHwId = null; state.editingMode = null;
+    render({skipFade:true});
+    const ok = await saveHomeworkToServer();
+    if (!ok) alert('Не удалось сохранить.');
+    else setSync('ok', '✓ ДЗ одобрено');
+    return;
+  }
+
+  /* --- Админ: отклонить pending --- */
+  const rejectBtn = e.target.closest('[data-reject]');
+  if (rejectBtn && isAdmin){
+    const lessonId = rejectBtn.dataset.reject;
+    const pendingId = rejectBtn.dataset.pendingId;
+    if (!confirm('Отклонить это предложение?')) return;
+    removePending(ds, lessonId, pendingId);
+    state.editingHwId = null; state.editingMode = null;
+    render({skipFade:true});
+    const ok = await saveHomeworkToServer(); if (!ok) alert('Не удалось сохранить.');
+    return;
+  }
+
+  /* --- Изменить занятие --- */
   const editBtn = e.target.closest('[data-edit]');
   if (editBtn && isAdmin){ openEditor(editBtn.dataset.edit); return; }
+
+  /* --- Добавить занятие --- */
   if (e.target.id === 'addLesson'){ openEditor(null); return; }
+
+  /* --- Развернуть карточку --- */
   const lessonEl = e.target.closest('[data-lesson]');
   if (lessonEl){
     if (e.target.closest('textarea') || e.target.closest('button')) return;
     const id = lessonEl.dataset.lesson;
     const willExpand = (state.expandedId !== id);
     state.expandedId = willExpand ? id : null;
-    state.editingHwId = null;
+    state.editingHwId = null; state.editingMode = null;
     render({skipFade:true});
     return;
   }
+
+  /* --- Переход в день --- */
   const dayCell = e.target.closest('[data-date]');
   if (dayCell && state.view !== 'day'){
-    state.date = parseYmd(dayCell.dataset.date); state.view = 'day'; state.expandedId = null; state.editingHwId = null;
+    state.date = parseYmd(dayCell.dataset.date); state.view = 'day';
+    state.expandedId = null; state.editingHwId = null; state.editingMode = null;
     document.querySelectorAll('.bottom button').forEach(b => b.classList.toggle('active', b.dataset.view === 'day'));
     render(); main.scrollTop = 0;
   }
@@ -607,15 +926,12 @@ adminBtn.onclick = openSettings;
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
-  const browserLabel = browserChoice === 'chrome' ? '🌐 Chrome'
-                     : browserChoice === 'safari' ? '🧭 Safari'
-                     : '— не выбран —';
+  const browserLabel = browserChoice === 'chrome' ? '🌐 Chrome' : browserChoice === 'safari' ? '🧭 Safari' : '— не выбран —';
   back.innerHTML = '<div class="modal">' +
       '<div class="modal-title">Настройки</div>' +
       '<div class="settings-section"><div class="settings-label">Тема оформления</div><div class="theme-toggle"><button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button><button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button></div></div>' +
       '<div class="settings-section"><div class="settings-label">Названия предметов</div><div class="theme-toggle"><button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button><button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button></div></div>' +
       '<div class="settings-section"><div class="settings-label">Браузер для установки</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + browserLabel + '</b></div><button class="btn primary" data-act="changeBrowser" style="width:100%">Изменить</button></div>' +
-      '<div class="settings-section"><div class="settings-label">Установка приложения</div><button class="btn primary" data-act="install" style="width:100%">📲 Установить на главный экран</button></div>' +
       '<div class="settings-section"><div class="settings-label">Профиль администратора</div>' + (isAdmin ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>' : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>') + '</div>' +
       '<div class="modal-actions"><button class="btn ghost" data-act="cancel">Закрыть</button></div></div>';
   document.body.appendChild(back);
@@ -627,7 +943,6 @@ function openSettings(){
     const act = ev.target.dataset ? ev.target.dataset.act : null;
     if (ev.target === back || act === 'cancel'){ back.remove(); return; }
     if (act === 'changeBrowser'){ back.remove(); browserChoice = null; store.set('browserChoice', null); showLaunchChoice(); return; }
-    if (act === 'install'){ back.remove(); sessionStorage.removeItem('install_dismissed'); tryInstall(); return; }
     if (act === 'openLogin'){ back.remove(); openAdminLogin(); return; }
     if (act === 'logout'){ if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return; isAdmin = false; store.set('admin', false); updateAdminUI(); back.remove(); render(); return; }
   });
@@ -667,9 +982,11 @@ function openEditor(lessonId){
       if (!confirm('Удалить занятие из расписания?')) return;
       const ds = ymd(state.date);
       schedule[di] = schedule[di].filter(l => l.id !== lesson.id);
-      if (homework[ds]){ delete homework[ds][lesson.id]; if (!Object.keys(homework[ds]).length) delete homework[ds]; }
-      store.set('schedule', schedule); store.set('homework', homework); saveHomeworkToServer();
-      state.expandedId = null; state.editingHwId = null; back.remove(); render({skipFade:true});
+      setApproved(ds, lesson.id, '');
+      removeAllPendingForLesson(ds, lesson.id);
+      store.set('schedule', schedule); saveHomeworkToServer();
+      state.expandedId = null; state.editingHwId = null; state.editingMode = null;
+      back.remove(); render({skipFade:true});
       return;
     }
     if (act === 'save'){
@@ -695,14 +1012,8 @@ function showLaunchChoice(){
   overlay.innerHTML = '<div class="launch-card">' +
       '<div class="launch-title">Через какой браузер вы открыли?</div>' +
       '<div class="launch-sub">Это поможет правильно предложить установку на главный экран</div>' +
-      '<button class="launch-btn" data-launch="chrome">' +
-        '<span class="lb-icon">🌐</span>' +
-        '<span class="lb-text"><span class="lb-title">Chrome</span><span class="lb-sub">Android или компьютер</span></span>' +
-      '</button>' +
-      '<button class="launch-btn" data-launch="safari">' +
-        '<span class="lb-icon">🧭</span>' +
-        '<span class="lb-text"><span class="lb-title">Safari</span><span class="lb-sub">iPhone или iPad</span></span>' +
-      '</button>' +
+      '<button class="launch-btn" data-launch="chrome"><span class="lb-icon">🌐</span><span class="lb-text"><span class="lb-title">Chrome</span><span class="lb-sub">Android или компьютер</span></span></button>' +
+      '<button class="launch-btn" data-launch="safari"><span class="lb-icon">🧭</span><span class="lb-text"><span class="lb-title">Safari</span><span class="lb-sub">iPhone или iPad</span></span></button>' +
     '</div>';
   document.body.appendChild(overlay);
   overlay.addEventListener('click', ev => {
@@ -721,13 +1032,12 @@ function showLaunchChoice(){
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('[PWA] beforeinstallprompt пойман — установка доступна');
+  console.log('[PWA] beforeinstallprompt пойман');
   e.preventDefault();
   deferredPrompt = e;
 });
 
 window.addEventListener('appinstalled', () => {
-  console.log('[PWA] установлено');
   deferredPrompt = null;
   removeInstallBanner();
   setSync('ok', '✓ приложение установлено');
@@ -738,83 +1048,46 @@ function removeInstallBanner(){
   const b = document.getElementById('installBanner');
   if (b) b.remove();
 }
-
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches ||
          window.navigator.standalone === true;
 }
-
 function tryInstall(){
-  if (isStandalone()){
-    alert('Приложение уже установлено и открыто с главного экрана.');
-    return;
-  }
-
-  // Если Chrome готов — вызываем системное окно
+  if (isStandalone()){ alert('Приложение уже установлено и открыто с главного экрана.'); return; }
   if (deferredPrompt){
-    console.log('[PWA] вызываем системное окно установки');
     try {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(choice => {
-        console.log('[PWA] userChoice:', choice.outcome);
-        if (choice.outcome === 'accepted'){
-          setSync('ok', '✓ устанавливается…');
-        }
+        if (choice.outcome === 'accepted') setSync('ok', '✓ устанавливается…');
         deferredPrompt = null;
       });
     } catch(e){ console.warn(e); }
     return;
   }
-
-  // Не готов — показываем плашку с объяснением
   showInstallBanner();
 }
-
 function showInstallBanner(){
   if (document.getElementById('installBanner')) return;
-
   const banner = document.createElement('div');
   banner.id = 'installBanner';
-  banner.innerHTML =
-    '<div class="ib-icon">📲</div>' +
-    '<div class="ib-text">' +
-      '<div class="ib-title">Установить приложение?</div>' +
-      '<div class="ib-sub">Быстрый доступ к дневнику с рабочего стола</div>' +
-      '<div class="ib-actions">' +
-        '<button class="ib-btn primary" id="ibInstall">Установить</button>' +
-        '<button class="ib-btn ghost" id="ibCancel">Отмена</button>' +
-      '</div>' +
-    '</div>' +
-    '<button class="ib-close" id="ibClose">✕</button>';
-
+  banner.innerHTML = '<div class="ib-icon">📲</div><div class="ib-text"><div class="ib-title">Установить приложение?</div><div class="ib-sub">Быстрый доступ к дневнику с рабочего стола</div><div class="ib-actions"><button class="ib-btn primary" id="ibInstall">Установить</button><button class="ib-btn ghost" id="ibCancel">Отмена</button></div></div><button class="ib-close" id="ibClose">✕</button>';
   document.body.appendChild(banner);
-
   document.getElementById('ibInstall').onclick = async () => {
     if (deferredPrompt){
       try {
         deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        console.log('[PWA] userChoice:', choice.outcome);
+        await deferredPrompt.userChoice;
         deferredPrompt = null;
-      } catch(e){ console.warn(e); }
+      } catch(e){}
       banner.remove();
     } else {
-      // Всё ещё не готов — показываем инструкцию
       banner.remove();
       showInstallHelp();
     }
   };
-
-  document.getElementById('ibCancel').onclick = () => {
-    sessionStorage.setItem('install_dismissed', '1');
-    banner.remove();
-  };
-  document.getElementById('ibClose').onclick = () => {
-    sessionStorage.setItem('install_dismissed', '1');
-    banner.remove();
-  };
+  document.getElementById('ibCancel').onclick = () => { sessionStorage.setItem('install_dismissed', '1'); banner.remove(); };
+  document.getElementById('ibClose').onclick = () => { sessionStorage.setItem('install_dismissed', '1'); banner.remove(); };
 }
-
 function showInstallHelp(){
   const ua = navigator.userAgent;
   const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -824,36 +1097,15 @@ function showInstallHelp(){
   const isYandex = /YaBrowser/.test(ua);
   const pageUrl = location.origin + location.pathname;
   let stepsHtml = '';
-
   if (isYandex){
-    stepsHtml =
-      '<p>Яндекс.Браузер <b>не поддерживает установку приложений</b> на главный экран.</p>' +
-      '<ol>' +
-        '<li>Скопируйте ссылку:<br><code>' + pageUrl + '</code></li>' +
-        '<li>Откройте её в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone)</li>' +
-        '<li>В Chrome нажмите <b>⋮</b> → <b>«Установить приложение»</b></li>' +
-      '</ol>';
+    stepsHtml = '<p>Яндекс.Браузер <b>не поддерживает установку приложений</b> на главный экран.</p><ol><li>Скопируйте ссылку:<br><code>' + pageUrl + '</code></li><li>Откройте в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone)</li><li>В Chrome <b>⋮</b> → <b>«Установить приложение»</b></li></ol>';
   } else if (isIOS && isSafari){
-    stepsHtml =
-      '<ol>' +
-        '<li>Нажмите <b>Поделиться</b> <b>⎙</b> внизу экрана</li>' +
-        '<li>Выберите <b>«На экран "Домой"»</b></li>' +
-        '<li>Нажмите <b>«Добавить»</b></li>' +
-      '</ol>';
+    stepsHtml = '<ol><li>Нажмите <b>Поделиться</b> <b>⎙</b> внизу экрана</li><li>Выберите <b>«На экран "Домой"»</b></li><li>Нажмите <b>«Добавить»</b></li></ol>';
   } else if (isAndroid && isChrome){
-    stepsHtml =
-      '<p>Chrome пока не готов предложить установку в один клик. Это значит, что чего-то не хватает в PWA.</p>' +
-      '<ol>' +
-        '<li>Нажмите <b>⋮</b> в правом верхнем углу Chrome</li>' +
-        '<li>Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b></li>' +
-        '<li>Если пункта нет — очистите данные сайта в настройках Chrome и попробуйте снова</li>' +
-      '</ol>';
+    stepsHtml = '<ol><li>Нажмите <b>⋮</b> в Chrome</li><li>Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b></li><li>Если пункта нет — очистите данные сайта и попробуйте снова</li></ol>';
   } else {
-    stepsHtml =
-      '<p>Откройте эту страницу в <b>Chrome</b> (Android, ПК) или <b>Safari</b> (iPhone) — там установка работает.</p>' +
-      '<div class="help-note">Адрес сайта:<br><code>' + pageUrl + '</code></div>';
+    stepsHtml = '<p>Откройте эту страницу в <b>Chrome</b> (Android, ПК) или <b>Safari</b> (iPhone) — там установка работает.</p><div class="help-note">Адрес сайта:<br><code>' + pageUrl + '</code></div>';
   }
-
   const back = document.createElement('div');
   back.className = 'modal-back';
   back.innerHTML = '<div class="modal"><div class="modal-title">Установка вручную</div><div class="help-steps">' + stepsHtml + '</div><div class="modal-actions"><button class="btn primary" data-act="close">Понятно</button></div></div>';
@@ -874,19 +1126,15 @@ setInterval(() => { if (!document.hidden) loadHomeworkFromServer().then(ok => { 
 
 if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(e => {
-      console.warn('[PWA] sw.js не зарегистрирован:', e);
-    });
+    navigator.serviceWorker.register('sw.js').catch(e => console.warn('[PWA] sw:', e));
   });
 }
 
-// Первый запуск или уже выбранный браузер
 setTimeout(() => {
   if (isStandalone()) return;
   if (browserChoice === null){
     showLaunchChoice();
   } else if (!sessionStorage.getItem('install_dismissed')){
-    // Даём 2.5 секунды, чтобы Chrome успел выдать beforeinstallprompt
     setTimeout(showInstallBanner, 2500);
   }
 }, 800);
