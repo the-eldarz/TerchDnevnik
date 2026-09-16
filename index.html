@@ -77,11 +77,9 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .no-hw{color:var(--muted);font-style:italic;font-size:13.5px;}
 .no-teacher{color:var(--muted);font-style:italic;font-size:13.5px;}
 
-/* Одобренное ДЗ */
 .hw-display{position:relative;background:var(--hw-bg);border:1.5px solid var(--accent);border-left-width:5px;border-radius:12px;padding:13px 14px 13px 15px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;color:var(--text);box-shadow:0 2px 10px rgba(61,109,255,.10);}
 .hw-display::before{content:'ДЗ';display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
 
-/* ДЗ на проверке (у админа) */
 .hw-pending{position:relative;background:var(--pending-bg);border:1.5px solid var(--pending);border-left-width:5px;border-radius:12px;padding:12px 14px 12px 15px;font-size:14px;line-height:1.5;color:var(--text);box-shadow:0 2px 10px rgba(245,158,11,.14);margin-top:8px;}
 .hw-pending:first-child{margin-top:0;}
 .hw-pending-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:12px;color:var(--pending-text);font-weight:700;}
@@ -93,12 +91,10 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .hw-pending-actions .approve:active{opacity:.85;}
 .hw-pending-actions .reject{background:var(--bg);color:var(--danger);}
 
-/* У пользователя своё pending */
 .hw-user-pending{position:relative;background:var(--pending-bg);border:1.5px dashed var(--pending);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);}
 .hw-user-pending-label{display:inline-block;background:var(--pending);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
 .hw-user-pending .hint2{font-size:11.5px;color:var(--pending-text);margin-top:6px;}
 
-/* Ряд ДЗ + карандаш */
 .hw-view-row{display:flex;gap:10px;align-items:flex-start;}
 .hw-view-row .hw-display{flex:1;min-width:0;}
 .hw-view-row .no-hw{flex:1;min-width:0;display:flex;align-items:center;min-height:42px;padding:0 4px;}
@@ -234,7 +230,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 19;
+const VERSION    = 21;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
@@ -273,13 +269,57 @@ const DOW_FULL = ['Понедельник','Вторник','Среда','Чет
 const DOW_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 const DEFAULT_SCHEDULE = [
-  [{id:'mon1',time:'08:30–09:00',subject:'Разг. о важ.'},{id:'mon2',time:'09:10–09:55',subject:'Алгебра'},{id:'mon3',time:'10:05–10:50',subject:'Химия'},{id:'mon4',time:'11:00–11:45',subject:'Общество'},{id:'mon5',time:'11:50–12:35',subject:'Англ. язык'},{id:'mon6',time:'12:40–13:25',subject:'Литература'},{id:'mon7',time:'13:30–14:15',subject:'Физ-ра'}],
-  [{id:'tue1',time:'08:30–09:15',subject:'Биология'},{id:'tue2',time:'09:25–10:10',subject:'Геометрия'},{id:'tue3',time:'10:20–11:05',subject:'Геометрия'},{id:'tue4',time:'11:25–12:10',subject:'Англ. яз.'},{id:'tue5',time:'12:20–13:05',subject:'Физика'},{id:'tue6',time:'13:15–14:00',subject:'География'}],
-  [{id:'wed1',time:'08:30–09:15',subject:'Химия'},{id:'wed2',time:'09:25–10:10',subject:'Каб. яз.'},{id:'wed3',time:'10:20–11:05',subject:'Биология'},{id:'wed4',time:'11:25–12:10',subject:'История'},{id:'wed5',time:'12:20–13:05',subject:'Русс. яз.'},{id:'wed6',time:'13:15–14:00',subject:'Физ-ра'}],
-  [{id:'thu1',time:'08:30–09:15',subject:'История'},{id:'thu2',time:'09:25–10:10',subject:'Каб. литература'},{id:'thu3',time:'10:20–11:05',subject:'Англ. яз.'},{id:'thu4',time:'11:25–12:10',subject:'Русс. яз.'},{id:'thu5',time:'12:20–13:05',subject:'Физика'},{id:'thu6',time:'13:15–14:00',subject:'Химия'}],
-  [{id:'fri1',time:'08:30–09:15',subject:'Матем.'},{id:'fri2',time:'09:25–10:10',subject:'Биология'},{id:'fri3',time:'10:20–11:05',subject:'Физ-ра'},{id:'fri4',time:'11:25–12:10',subject:'Общество'},{id:'fri5',time:'12:20–13:05',subject:'Русс. яз.'},{id:'fri6',time:'13:15–14:00',subject:'Учебный курс по русс. языку'},{id:'fri7',time:'14:05–14:50',subject:'Каб. язык'}],
-  [{id:'sat1',time:'08:30–09:15',subject:'Информатика'},{id:'sat2',time:'09:25–10:10',subject:'Алгебра'},{id:'sat3',time:'10:20–11:05',subject:'ОБЗР'},{id:'sat4',time:'11:25–12:10',subject:'Литература'},{id:'sat5',time:'12:20–13:05',subject:'Вероятность и статистика'},{id:'sat6',time:'13:15–14:00',subject:'Культура КБР'}],
-  []
+  [ // Пн
+    {id:'mon1',time:'08:30–09:00',subject:'Разг. о важ.'},
+    {id:'mon2',time:'09:10–09:55',subject:'Алгебра'},
+    {id:'mon3',time:'10:05–10:50',subject:'Химия'},
+    {id:'mon4',time:'11:10–11:55',subject:'Общество'},
+    {id:'mon5',time:'12:05–12:50',subject:'Англ. язык'},
+    {id:'mon6',time:'12:55–13:40',subject:'Литература'},
+    {id:'mon7',time:'13:45–14:30',subject:'Физ-ра'}
+  ],
+  [ // Вт
+    {id:'tue1',time:'08:30–09:15',subject:'Биология'},
+    {id:'tue2',time:'09:25–10:10',subject:'Геометрия'},
+    {id:'tue3',time:'10:20–11:05',subject:'Геометрия'},
+    {id:'tue4',time:'11:25–12:10',subject:'Англ. яз.'},
+    {id:'tue5',time:'12:20–13:05',subject:'Физика'},
+    {id:'tue6',time:'13:10–13:55',subject:'География'}
+  ],
+  [ // Ср
+    {id:'wed1',time:'08:30–09:15',subject:'Химия'},
+    {id:'wed2',time:'09:25–10:10',subject:'Каб. яз.'},
+    {id:'wed3',time:'10:20–11:05',subject:'Биология'},
+    {id:'wed4',time:'11:25–12:10',subject:'История'},
+    {id:'wed5',time:'12:20–13:05',subject:'Литература'},
+    {id:'wed6',time:'13:10–13:55',subject:'Физ-ра'}
+  ],
+  [ // Чт
+    {id:'thu1',time:'08:30–09:15',subject:'История'},
+    {id:'thu2',time:'09:25–10:10',subject:'Каб. литература'},
+    {id:'thu3',time:'10:20–11:05',subject:'Англ. яз.'},
+    {id:'thu4',time:'11:25–12:10',subject:'Русс. яз.'},
+    {id:'thu5',time:'12:20–13:05',subject:'Физика'},
+    {id:'thu6',time:'13:10–13:55',subject:'Химия'}
+  ],
+  [ // Пт
+    {id:'fri1',time:'08:30–09:15',subject:'Матем.'},
+    {id:'fri2',time:'09:25–10:10',subject:'Биология'},
+    {id:'fri3',time:'10:20–11:05',subject:'Физ-ра'},
+    {id:'fri4',time:'11:25–12:10',subject:'Общество'},
+    {id:'fri5',time:'12:20–13:05',subject:'Русс. яз.'},
+    {id:'fri6',time:'13:10–13:55',subject:'Учебный курс по русс. языку'},
+    {id:'fri7',time:'14:00–14:45',subject:'Каб. язык'}
+  ],
+  [ // Сб
+    {id:'sat1',time:'08:30–09:15',subject:'Информатика'},
+    {id:'sat2',time:'09:20–10:05',subject:'Алгебра'},
+    {id:'sat3',time:'10:10–10:55',subject:'ОБЗР'},
+    {id:'sat4',time:'11:05–11:50',subject:'Литература'},
+    {id:'sat5',time:'11:55–12:40',subject:'Вероятность и статистика'},
+    {id:'sat6',time:'12:45–13:30',subject:'Культура КБР'}
+  ],
+  [] // Вс
 ];
 
 const store = {
@@ -300,10 +340,8 @@ let currentTheme = store.get('theme', 'light');
 let shortNames = store.get('shortNames', true);
 let browserChoice = store.get('browserChoice', null);
 
-// Структура ДЗ: { approved: { '2026-09-13': { lessonId: 'текст' } }, pending: { '2026-09-13': { lessonId: [ {id, text, name, ts, anonId} ] } } }
 let homework = { approved: {}, pending: {} };
 
-/* ID текущего пользователя (для отслеживания своих pending) */
 function getAnonId(){
   let id = localStorage.getItem('sched_anonId');
   if (!id){
@@ -350,7 +388,6 @@ function setSync(state, text){
   }
 }
 
-/* Нормализация формата: поддержка старого (плоский объект) и нового (approved/pending) */
 function normalizeHomework(data){
   if (!data || typeof data !== 'object' || Array.isArray(data)){
     return { approved: {}, pending: {} };
@@ -361,7 +398,6 @@ function normalizeHomework(data){
       pending:  (data.pending  && typeof data.pending  === 'object') ? data.pending  : {}
     };
   }
-  // старый формат: { '2026-09-13': { lessonId: 'text' } }
   return { approved: data, pending: {} };
 }
 
@@ -373,7 +409,6 @@ async function loadHomeworkFromServer(){
     const data = await r.json();
     const record = data && data.record;
     if (record && typeof record === 'object'){
-      // Если bin содержал тестовый { test: 1 } — обнуляем
       if (Object.keys(record).length === 1 && record.test !== undefined){
         homework = { approved: {}, pending: {} };
       } else {
@@ -440,7 +475,6 @@ function getTeacher(lesson){
   return '';
 }
 
-/* Доступ к ДЗ конкретного дня/урока */
 function getApproved(ds, lessonId){
   const day = homework.approved && homework.approved[ds];
   return (day && day[lessonId]) || '';
@@ -462,7 +496,6 @@ function addPending(ds, lessonId, text, name){
   if (!homework.pending) homework.pending = {};
   if (!homework.pending[ds]) homework.pending[ds] = {};
   if (!homework.pending[ds][lessonId]) homework.pending[ds][lessonId] = [];
-  // Убираем старую заявку этого же пользователя (перезапись)
   homework.pending[ds][lessonId] = homework.pending[ds][lessonId].filter(p => p.anonId !== MY_ID);
   homework.pending[ds][lessonId].push({
     id: 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
@@ -534,7 +567,6 @@ function renderDay(){
 
       let hwBlock = '';
 
-      /* ===== Режим редактирования ===== */
       if (editingApproved && isAdmin){
         hwBlock =
           '<textarea class="hw-edit" data-hw-for="' + esc(l.id) + '" placeholder="Что задали...">' + esc(approvedText) + '</textarea>' +
@@ -554,11 +586,8 @@ function renderDay(){
             '<button class="cancel-hw" data-cancel-hw="1">Закрыть</button>' +
           '</div>';
       }
-      /* ===== Режим просмотра ===== */
       else if (isAdmin){
-        // У админа: approved + все pending + карандаш
         let inner = '';
-        // Все pending — оранжевые рамки
         pendingList.forEach(p => {
           inner +=
             '<div class="hw-pending">' +
@@ -570,7 +599,6 @@ function renderDay(){
               '</div>' +
             '</div>';
         });
-        // Approved
         if (approvedText){
           inner +=
             '<div class="hw-view-row" style="margin-top:' + (pendingList.length ? '10px' : '0') + ';">' +
@@ -584,7 +612,6 @@ function renderDay(){
               '<button class="pencil-btn" data-edit-hw="' + esc(l.id) + '" data-mode="approved" title="Добавить ДЗ">✎</button>' +
             '</div>';
         } else {
-          // Есть pending, approved нет — оставляем карандаш для добавления своего
           inner +=
             '<div class="hw-view-row" style="margin-top:10px;">' +
               '<div class="no-hw">Своё ДЗ (одобренное) не задано</div>' +
@@ -593,7 +620,6 @@ function renderDay(){
         }
         hwBlock = inner;
       } else {
-        // Обычный пользователь
         let inner = '';
         if (approvedText){
           inner += '<div class="hw-display">' + esc(approvedText) + '</div>';
@@ -763,23 +789,17 @@ function finishSwipe(direction){
 
 document.addEventListener('keydown', e => { if (document.querySelector('.modal-back')) return; if (e.key === 'ArrowLeft') shiftNoAnim(-1); if (e.key === 'ArrowRight') shiftNoAnim(1); });
 
-/* ============================================================
-   ОБРАБОТЧИК КЛИКОВ
-   ============================================================ */
 content.addEventListener('click', async e => {
   const ds = ymd(state.date);
 
-  /* --- Карандаш: открыть редактор --- */
   const pencilBtn = e.target.closest('[data-edit-hw]');
   if (pencilBtn){
     const lessonId = pencilBtn.dataset.editHw;
     const mode = pencilBtn.dataset.mode || (isAdmin ? 'approved' : 'pending');
-    // Обычный пользователь не может редактировать approved
     if (mode === 'approved' && !isAdmin) return;
     if (mode === 'pending' && isAdmin) return;
 
     if (mode === 'pending'){
-      // Спросить имя перед первой отправкой
       askUserName();
     }
 
@@ -793,7 +813,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Отмена редактирования --- */
   const cancelBtn = e.target.closest('[data-cancel-hw]');
   if (cancelBtn){
     state.editingHwId = null; state.editingMode = null;
@@ -801,7 +820,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Админ: сохранить approved --- */
   const saveBtn = e.target.closest('[data-save]');
   if (saveBtn && isAdmin){
     const lessonId = saveBtn.dataset.save;
@@ -815,7 +833,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Админ: удалить approved --- */
   const delHw = e.target.closest('[data-delete-hw]');
   if (delHw && isAdmin){
     const lessonId = delHw.dataset.deleteHw;
@@ -827,7 +844,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Пользователь: отправить pending --- */
   const submitBtn = e.target.closest('[data-submit-hw]');
   if (submitBtn && !isAdmin){
     const lessonId = submitBtn.dataset.submitHw;
@@ -845,7 +861,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Пользователь: отменить свою заявку --- */
   const cancelPendingBtn = e.target.closest('[data-cancel-pending]');
   if (cancelPendingBtn && !isAdmin){
     const lessonId = cancelPendingBtn.dataset.cancelPending;
@@ -859,7 +874,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Админ: одобрить pending --- */
   const approveBtn = e.target.closest('[data-approve]');
   if (approveBtn && isAdmin){
     const lessonId = approveBtn.dataset.approve;
@@ -867,7 +881,6 @@ content.addEventListener('click', async e => {
     const list = getPendingList(ds, lessonId);
     const item = list.find(p => p.id === pendingId);
     if (!item) return;
-    // Переносим текст в approved, чистим все pending на этот урок
     setApproved(ds, lessonId, item.text);
     removeAllPendingForLesson(ds, lessonId);
     state.editingHwId = null; state.editingMode = null;
@@ -878,7 +891,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Админ: отклонить pending --- */
   const rejectBtn = e.target.closest('[data-reject]');
   if (rejectBtn && isAdmin){
     const lessonId = rejectBtn.dataset.reject;
@@ -891,14 +903,11 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Изменить занятие --- */
   const editBtn = e.target.closest('[data-edit]');
   if (editBtn && isAdmin){ openEditor(editBtn.dataset.edit); return; }
 
-  /* --- Добавить занятие --- */
   if (e.target.id === 'addLesson'){ openEditor(null); return; }
 
-  /* --- Развернуть карточку --- */
   const lessonEl = e.target.closest('[data-lesson]');
   if (lessonEl){
     if (e.target.closest('textarea') || e.target.closest('button')) return;
@@ -910,7 +919,6 @@ content.addEventListener('click', async e => {
     return;
   }
 
-  /* --- Переход в день --- */
   const dayCell = e.target.closest('[data-date]');
   if (dayCell && state.view !== 'day'){
     state.date = parseYmd(dayCell.dataset.date); state.view = 'day';
@@ -1002,9 +1010,6 @@ function openEditor(lessonId){
   });
 }
 
-/* ============================================================
-   ВЫБОР БРАУЗЕРА
-   ============================================================ */
 function showLaunchChoice(){
   if (document.getElementById('launchChoice')) return;
   const overlay = document.createElement('div');
@@ -1026,24 +1031,17 @@ function showLaunchChoice(){
   });
 }
 
-/* ============================================================
-   УСТАНОВКА PWA
-   ============================================================ */
 let deferredPrompt = null;
-
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('[PWA] beforeinstallprompt пойман');
   e.preventDefault();
   deferredPrompt = e;
 });
-
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
   removeInstallBanner();
   setSync('ok', '✓ приложение установлено');
   sessionStorage.setItem('install_dismissed', '1');
 });
-
 function removeInstallBanner(){
   const b = document.getElementById('installBanner');
   if (b) b.remove();
@@ -1115,9 +1113,6 @@ function showInstallHelp(){
   });
 }
 
-/* ============================================================
-   СТАРТ
-   ============================================================ */
 updateAdminUI();
 render();
 loadHomeworkFromServer().then(ok => { if (ok) render({skipFade:true}); });
