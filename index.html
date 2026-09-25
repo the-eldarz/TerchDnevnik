@@ -76,10 +76,8 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .detail-value.teacher{font-weight:500;}
 .no-hw{color:var(--muted);font-style:italic;font-size:13.5px;}
 .no-teacher{color:var(--muted);font-style:italic;font-size:13.5px;}
-
 .hw-display{position:relative;background:var(--hw-bg);border:1.5px solid var(--accent);border-left-width:5px;border-radius:12px;padding:13px 14px 13px 15px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;color:var(--text);box-shadow:0 2px 10px rgba(61,109,255,.10);}
 .hw-display::before{content:'ДЗ';display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
-
 .hw-pending{position:relative;background:var(--pending-bg);border:1.5px solid var(--pending);border-left-width:5px;border-radius:12px;padding:12px 14px 12px 15px;font-size:14px;line-height:1.5;color:var(--text);box-shadow:0 2px 10px rgba(245,158,11,.14);margin-top:8px;}
 .hw-pending:first-child{margin-top:0;}
 .hw-pending-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:12px;color:var(--pending-text);font-weight:700;}
@@ -90,17 +88,14 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .hw-pending-actions .approve{background:#16a34a;color:#fff;}
 .hw-pending-actions .approve:active{opacity:.85;}
 .hw-pending-actions .reject{background:var(--bg);color:var(--danger);}
-
 .hw-user-pending{position:relative;background:var(--pending-bg);border:1.5px dashed var(--pending);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);}
 .hw-user-pending-label{display:inline-block;background:var(--pending);color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:1px;}
 .hw-user-pending .hint2{font-size:11.5px;color:var(--pending-text);margin-top:6px;}
-
 .hw-view-row{display:flex;gap:10px;align-items:flex-start;}
 .hw-view-row .hw-display{flex:1;min-width:0;}
 .hw-view-row .no-hw{flex:1;min-width:0;display:flex;align-items:center;min-height:42px;padding:0 4px;}
 .pencil-btn{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);border:none;font-size:17px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:transform .15s ease,background .15s ease;}
 .pencil-btn:active{transform:scale(.92);background:var(--accent);color:#fff;}
-
 .hw-edit{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:11px;font-size:14.5px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:60px;}
 .hw-edit:focus{border-color:var(--accent);background:var(--card);}
 .hw-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -113,7 +108,6 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .cancel-hw{padding:9px 16px;border-radius:10px;border:none;background:var(--bg);color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .cancel-hw:active{opacity:.75;}
 .btn-edit-lesson{margin-top:8px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;font-family:inherit;}
-
 .empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:15px;}
 .empty .big{font-size:34px;display:block;margin-bottom:10px;}
 .add-btn{margin-top:14px;width:100%;padding:13px;border-radius:14px;border:1.5px dashed var(--accent);background:transparent;color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
@@ -185,6 +179,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .launch-btn .lb-text{flex:1;min-width:0;}
 .launch-btn .lb-title{font-weight:700;font-size:15px;display:block;margin-bottom:2px;}
 .launch-btn .lb-sub{font-size:12px;color:var(--muted);display:block;line-height:1.3;}
+.launch-back{width:100%;padding:10px;margin-top:10px;background:transparent;border:none;color:var(--muted);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 #installBanner{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--card);color:var(--text);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.22);padding:14px 14px 12px;display:flex;align-items:flex-start;gap:10px;z-index:200;animation:hsSlideUp .35s cubic-bezier(.2,.9,.3,1);border:1px solid var(--border);}
 @keyframes hsSlideUp{from{transform:translateY(80px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 #installBanner .ib-icon{font-size:24px;flex:0 0 auto;line-height:1.1;padding-top:2px;}
@@ -230,7 +225,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 </div>
 <script>
 const ADMIN_PASS = '565789064';
-const VERSION    = 21;
+const VERSION    = 22;
 const JSONBIN_BIN_ID = '6aa573f4ac6210605ac518d0';
 const JSONBIN_KEY    = '$2a$10$cEN.Qxy59eYheW9TTw/3DeD.9wsILJITmv9jccWBlaTO5WuvdhSca';
 const JSONBIN_URL    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
@@ -269,57 +264,13 @@ const DOW_FULL = ['Понедельник','Вторник','Среда','Чет
 const DOW_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 const DEFAULT_SCHEDULE = [
-  [ // Пн
-    {id:'mon1',time:'08:30–09:00',subject:'Разг. о важ.'},
-    {id:'mon2',time:'09:10–09:55',subject:'Алгебра'},
-    {id:'mon3',time:'10:05–10:50',subject:'Химия'},
-    {id:'mon4',time:'11:10–11:55',subject:'Общество'},
-    {id:'mon5',time:'12:05–12:50',subject:'Англ. язык'},
-    {id:'mon6',time:'12:55–13:40',subject:'Литература'},
-    {id:'mon7',time:'13:45–14:30',subject:'Физ-ра'}
-  ],
-  [ // Вт
-    {id:'tue1',time:'08:30–09:15',subject:'Биология'},
-    {id:'tue2',time:'09:25–10:10',subject:'Геометрия'},
-    {id:'tue3',time:'10:20–11:05',subject:'Геометрия'},
-    {id:'tue4',time:'11:25–12:10',subject:'Англ. яз.'},
-    {id:'tue5',time:'12:20–13:05',subject:'Физика'},
-    {id:'tue6',time:'13:10–13:55',subject:'География'}
-  ],
-  [ // Ср
-    {id:'wed1',time:'08:30–09:15',subject:'Химия'},
-    {id:'wed2',time:'09:25–10:10',subject:'Каб. яз.'},
-    {id:'wed3',time:'10:20–11:05',subject:'Биология'},
-    {id:'wed4',time:'11:25–12:10',subject:'История'},
-    {id:'wed5',time:'12:20–13:05',subject:'Литература'},
-    {id:'wed6',time:'13:10–13:55',subject:'Физ-ра'}
-  ],
-  [ // Чт
-    {id:'thu1',time:'08:30–09:15',subject:'История'},
-    {id:'thu2',time:'09:25–10:10',subject:'Каб. литература'},
-    {id:'thu3',time:'10:20–11:05',subject:'Англ. яз.'},
-    {id:'thu4',time:'11:25–12:10',subject:'Русс. яз.'},
-    {id:'thu5',time:'12:20–13:05',subject:'Физика'},
-    {id:'thu6',time:'13:10–13:55',subject:'Химия'}
-  ],
-  [ // Пт
-    {id:'fri1',time:'08:30–09:15',subject:'Матем.'},
-    {id:'fri2',time:'09:25–10:10',subject:'Биология'},
-    {id:'fri3',time:'10:20–11:05',subject:'Физ-ра'},
-    {id:'fri4',time:'11:25–12:10',subject:'Общество'},
-    {id:'fri5',time:'12:20–13:05',subject:'Русс. яз.'},
-    {id:'fri6',time:'13:10–13:55',subject:'Учебный курс по русс. языку'},
-    {id:'fri7',time:'14:00–14:45',subject:'Каб. язык'}
-  ],
-  [ // Сб
-    {id:'sat1',time:'08:30–09:15',subject:'Информатика'},
-    {id:'sat2',time:'09:20–10:05',subject:'Алгебра'},
-    {id:'sat3',time:'10:10–10:55',subject:'ОБЗР'},
-    {id:'sat4',time:'11:05–11:50',subject:'Литература'},
-    {id:'sat5',time:'11:55–12:40',subject:'Вероятность и статистика'},
-    {id:'sat6',time:'12:45–13:30',subject:'Культура КБР'}
-  ],
-  [] // Вс
+  [{id:'mon1',time:'08:30–09:00',subject:'Разг. о важ.'},{id:'mon2',time:'09:10–09:55',subject:'Алгебра'},{id:'mon3',time:'10:05–10:50',subject:'Химия'},{id:'mon4',time:'11:10–11:55',subject:'Общество'},{id:'mon5',time:'12:05–12:50',subject:'Англ. язык'},{id:'mon6',time:'12:55–13:40',subject:'Литература'},{id:'mon7',time:'13:45–14:30',subject:'Физ-ра'}],
+  [{id:'tue1',time:'08:30–09:15',subject:'Биология'},{id:'tue2',time:'09:25–10:10',subject:'Геометрия'},{id:'tue3',time:'10:20–11:05',subject:'Геометрия'},{id:'tue4',time:'11:25–12:10',subject:'Англ. яз.'},{id:'tue5',time:'12:20–13:05',subject:'Физика'},{id:'tue6',time:'13:10–13:55',subject:'География'}],
+  [{id:'wed1',time:'08:30–09:15',subject:'Химия'},{id:'wed2',time:'09:25–10:10',subject:'Каб. яз.'},{id:'wed3',time:'10:20–11:05',subject:'Биология'},{id:'wed4',time:'11:25–12:10',subject:'История'},{id:'wed5',time:'12:20–13:05',subject:'Литература'},{id:'wed6',time:'13:10–13:55',subject:'Физ-ра'}],
+  [{id:'thu1',time:'08:30–09:15',subject:'История'},{id:'thu2',time:'09:25–10:10',subject:'Каб. литература'},{id:'thu3',time:'10:20–11:05',subject:'Англ. яз.'},{id:'thu4',time:'11:25–12:10',subject:'Русс. яз.'},{id:'thu5',time:'12:20–13:05',subject:'Физика'},{id:'thu6',time:'13:10–13:55',subject:'Химия'}],
+  [{id:'fri1',time:'08:30–09:15',subject:'Матем.'},{id:'fri2',time:'09:25–10:10',subject:'Биология'},{id:'fri3',time:'10:20–11:05',subject:'Физ-ра'},{id:'fri4',time:'11:25–12:10',subject:'Общество'},{id:'fri5',time:'12:20–13:05',subject:'Русс. яз.'},{id:'fri6',time:'13:10–13:55',subject:'Учебный курс по русс. языку'},{id:'fri7',time:'14:00–14:45',subject:'Каб. язык'}],
+  [{id:'sat1',time:'08:30–09:15',subject:'Информатика'},{id:'sat2',time:'09:20–10:05',subject:'Алгебра'},{id:'sat3',time:'10:10–10:55',subject:'ОБЗР'},{id:'sat4',time:'11:05–11:50',subject:'Литература'},{id:'sat5',time:'11:55–12:40',subject:'Вероятность и статистика'},{id:'sat6',time:'12:45–13:30',subject:'Культура КБР'}],
+  []
 ];
 
 const store = {
@@ -338,7 +289,8 @@ let schedule = store.get('schedule', DEFAULT_SCHEDULE);
 let isAdmin = store.get('admin', false);
 let currentTheme = store.get('theme', 'light');
 let shortNames = store.get('shortNames', true);
-let browserChoice = store.get('browserChoice', null);
+let launchMode = store.get('launchMode', null);       // null | 'app' | 'browser'
+let browserChoice = store.get('browserChoice', null); // null | 'chrome' | 'safari'
 
 let homework = { approved: {}, pending: {} };
 
@@ -799,9 +751,7 @@ content.addEventListener('click', async e => {
     if (mode === 'approved' && !isAdmin) return;
     if (mode === 'pending' && isAdmin) return;
 
-    if (mode === 'pending'){
-      askUserName();
-    }
+    if (mode === 'pending') askUserName();
 
     state.editingHwId = lessonId;
     state.editingMode = mode;
@@ -934,12 +884,14 @@ adminBtn.onclick = openSettings;
 function openSettings(){
   const back = document.createElement('div');
   back.className = 'modal-back';
-  const browserLabel = browserChoice === 'chrome' ? '🌐 Chrome' : browserChoice === 'safari' ? '🧭 Safari' : '— не выбран —';
+  const launchLabel = launchMode === 'app' ? '📱 Приложение'
+                    : launchMode === 'browser' ? ('🌐 Браузер' + (browserChoice === 'chrome' ? ' (Chrome)' : browserChoice === 'safari' ? ' (Safari)' : ''))
+                    : '— не выбран —';
   back.innerHTML = '<div class="modal">' +
       '<div class="modal-title">Настройки</div>' +
       '<div class="settings-section"><div class="settings-label">Тема оформления</div><div class="theme-toggle"><button class="theme-opt' + (currentTheme === 'light' ? ' active' : '') + '" data-theme-set="light">☀️ Светлая</button><button class="theme-opt' + (currentTheme === 'dark' ? ' active' : '') + '" data-theme-set="dark">🌙 Тёмная</button></div></div>' +
       '<div class="settings-section"><div class="settings-label">Названия предметов</div><div class="theme-toggle"><button class="theme-opt' + (shortNames ? ' active' : '') + '" data-short="1">Короткие</button><button class="theme-opt' + (!shortNames ? ' active' : '') + '" data-short="0">Полные</button></div></div>' +
-      '<div class="settings-section"><div class="settings-label">Браузер для установки</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + browserLabel + '</b></div><button class="btn primary" data-act="changeBrowser" style="width:100%">Изменить</button></div>' +
+      '<div class="settings-section"><div class="settings-label">Способ запуска</div><div class="settings-hint" style="margin-top:0;margin-bottom:10px;">Сейчас: <b>' + launchLabel + '</b></div><button class="btn primary" data-act="changeLaunch" style="width:100%">Изменить</button></div>' +
       '<div class="settings-section"><div class="settings-label">Профиль администратора</div>' + (isAdmin ? '<div class="admin-status"><span class="dot-on"></span>Вы вошли как администратор</div><button class="btn danger" data-act="logout" style="width:100%">Выйти из профиля</button>' : '<button class="btn primary" data-act="openLogin" style="width:100%">Войти как администратор</button>') + '</div>' +
       '<div class="modal-actions"><button class="btn ghost" data-act="cancel">Закрыть</button></div></div>';
   document.body.appendChild(back);
@@ -950,7 +902,15 @@ function openSettings(){
     if (shortBtn){ shortNames = shortBtn.dataset.short === '1'; store.set('shortNames', shortNames); back.querySelectorAll('[data-short]').forEach(b => b.classList.toggle('active', (b.dataset.short === '1') === shortNames)); render({skipFade:true}); return; }
     const act = ev.target.dataset ? ev.target.dataset.act : null;
     if (ev.target === back || act === 'cancel'){ back.remove(); return; }
-    if (act === 'changeBrowser'){ back.remove(); browserChoice = null; store.set('browserChoice', null); showLaunchChoice(); return; }
+    if (act === 'changeLaunch'){
+      back.remove();
+      launchMode = null; browserChoice = null;
+      store.set('launchMode', null); store.set('browserChoice', null);
+      sessionStorage.removeItem('install_dismissed');
+      removeInstallBanner();
+      showLaunchChoice();
+      return;
+    }
     if (act === 'openLogin'){ back.remove(); openAdminLogin(); return; }
     if (act === 'logout'){ if (!confirm('Вы уверены, что хотите выйти из аккаунта администратора?')) return; isAdmin = false; store.set('admin', false); updateAdminUI(); back.remove(); render(); return; }
   });
@@ -1010,27 +970,87 @@ function openEditor(lessonId){
   });
 }
 
+/* ============================================================
+   ВЫБОР СПОСОБА ЗАПУСКА — шаг 1: Приложение / Браузер
+   ============================================================ */
 function showLaunchChoice(){
   if (document.getElementById('launchChoice')) return;
   const overlay = document.createElement('div');
   overlay.id = 'launchChoice';
   overlay.innerHTML = '<div class="launch-card">' +
-      '<div class="launch-title">Через какой браузер вы открыли?</div>' +
-      '<div class="launch-sub">Это поможет правильно предложить установку на главный экран</div>' +
-      '<button class="launch-btn" data-launch="chrome"><span class="lb-icon">🌐</span><span class="lb-text"><span class="lb-title">Chrome</span><span class="lb-sub">Android или компьютер</span></span></button>' +
-      '<button class="launch-btn" data-launch="safari"><span class="lb-icon">🧭</span><span class="lb-text"><span class="lb-title">Safari</span><span class="lb-sub">iPhone или iPad</span></span></button>' +
+      '<div class="launch-title">Как вы открыли приложение?</div>' +
+      '<div class="launch-sub">Это поможет правильно вести себя приложению</div>' +
+      '<button class="launch-btn" data-launch="app">' +
+        '<span class="lb-icon">📱</span>' +
+        '<span class="lb-text"><span class="lb-title">Приложение</span><span class="lb-sub">Установленное APK на телефоне</span></span>' +
+      '</button>' +
+      '<button class="launch-btn" data-launch="browser">' +
+        '<span class="lb-icon">🌐</span>' +
+        '<span class="lb-text"><span class="lb-title">Браузер</span><span class="lb-sub">Открываю ссылку в Chrome или Safari</span></span>' +
+      '</button>' +
     '</div>';
   document.body.appendChild(overlay);
   overlay.addEventListener('click', ev => {
     const btn = ev.target.closest('[data-launch]');
     if (!btn) return;
-    browserChoice = btn.dataset.launch;
-    store.set('browserChoice', browserChoice);
+    const mode = btn.dataset.launch;
+    launchMode = mode;
+    store.set('launchMode', mode);
     overlay.remove();
-    setTimeout(tryInstall, 500);
+
+    if (mode === 'app'){
+      // Приложение — ничего не предлагаем, просто работаем
+      browserChoice = null;
+      store.set('browserChoice', null);
+      return;
+    }
+    // Браузер — спрашиваем какой именно
+    setTimeout(showBrowserChoice, 250);
   });
 }
 
+/* ============================================================
+   Шаг 2: Chrome / Safari
+   ============================================================ */
+function showBrowserChoice(){
+  if (document.getElementById('launchChoice')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'launchChoice';
+  overlay.innerHTML = '<div class="launch-card">' +
+      '<div class="launch-title">Через какой браузер?</div>' +
+      '<div class="launch-sub">Мы подскажем, как закрепить дневник на главном экране</div>' +
+      '<button class="launch-btn" data-launch="chrome">' +
+        '<span class="lb-icon">🌐</span>' +
+        '<span class="lb-text"><span class="lb-title">Chrome</span><span class="lb-sub">Android или компьютер</span></span>' +
+      '</button>' +
+      '<button class="launch-btn" data-launch="safari">' +
+        '<span class="lb-icon">🧭</span>' +
+        '<span class="lb-text"><span class="lb-title">Safari</span><span class="lb-sub">iPhone или iPad</span></span>' +
+      '</button>' +
+      '<button class="launch-back" data-back="1">← Назад</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', ev => {
+    if (ev.target.closest('[data-back]')){
+      overlay.remove();
+      launchMode = null;
+      store.set('launchMode', null);
+      setTimeout(showLaunchChoice, 200);
+      return;
+    }
+    const btn = ev.target.closest('[data-launch]');
+    if (!btn) return;
+    browserChoice = btn.dataset.launch;
+    store.set('browserChoice', browserChoice);
+    overlay.remove();
+    sessionStorage.removeItem('install_dismissed');
+    setTimeout(tryInstall, 400);
+  });
+}
+
+/* ============================================================
+   УСТАНОВКА PWA
+   ============================================================ */
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -1051,7 +1071,9 @@ function isStandalone(){
          window.navigator.standalone === true;
 }
 function tryInstall(){
-  if (isStandalone()){ alert('Приложение уже установлено и открыто с главного экрана.'); return; }
+  // Только если пользователь выбрал «Браузер»
+  if (launchMode !== 'browser') return;
+  if (isStandalone()) return;
   if (deferredPrompt){
     try {
       deferredPrompt.prompt();
@@ -1065,6 +1087,7 @@ function tryInstall(){
   showInstallBanner();
 }
 function showInstallBanner(){
+  if (launchMode !== 'browser') return;
   if (document.getElementById('installBanner')) return;
   const banner = document.createElement('div');
   banner.id = 'installBanner';
@@ -1095,14 +1118,16 @@ function showInstallHelp(){
   const isYandex = /YaBrowser/.test(ua);
   const pageUrl = location.origin + location.pathname;
   let stepsHtml = '';
-  if (isYandex){
-    stepsHtml = '<p>Яндекс.Браузер <b>не поддерживает установку приложений</b> на главный экран.</p><ol><li>Скопируйте ссылку:<br><code>' + pageUrl + '</code></li><li>Откройте в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone)</li><li>В Chrome <b>⋮</b> → <b>«Установить приложение»</b></li></ol>';
-  } else if (isIOS && isSafari){
+
+  // Если пользователь сам выбрал Safari — показываем инструкцию Safari
+  if (browserChoice === 'safari' || (isIOS && isSafari)){
     stepsHtml = '<ol><li>Нажмите <b>Поделиться</b> <b>⎙</b> внизу экрана</li><li>Выберите <b>«На экран "Домой"»</b></li><li>Нажмите <b>«Добавить»</b></li></ol>';
+  } else if (isYandex){
+    stepsHtml = '<p>Яндекс.Браузер <b>не поддерживает установку приложений</b> на главный экран.</p><ol><li>Скопируйте ссылку:<br><code>' + pageUrl + '</code></li><li>Откройте в <b>Chrome</b> (Android) или <b>Safari</b> (iPhone)</li></ol>';
   } else if (isAndroid && isChrome){
     stepsHtml = '<ol><li>Нажмите <b>⋮</b> в Chrome</li><li>Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b></li><li>Если пункта нет — очистите данные сайта и попробуйте снова</li></ol>';
   } else {
-    stepsHtml = '<p>Откройте эту страницу в <b>Chrome</b> (Android, ПК) или <b>Safari</b> (iPhone) — там установка работает.</p><div class="help-note">Адрес сайта:<br><code>' + pageUrl + '</code></div>';
+    stepsHtml = '<p>Откройте эту страницу в <b>Chrome</b> (Android, ПК) или <b>Safari</b> (iPhone) — там установка работает в один клик.</p><div class="help-note">Адрес сайта:<br><code>' + pageUrl + '</code></div>';
   }
   const back = document.createElement('div');
   back.className = 'modal-back';
@@ -1113,6 +1138,9 @@ function showInstallHelp(){
   });
 }
 
+/* ============================================================
+   СТАРТ
+   ============================================================ */
 updateAdminUI();
 render();
 loadHomeworkFromServer().then(ok => { if (ok) render({skipFade:true}); });
@@ -1126,12 +1154,12 @@ if ('serviceWorker' in navigator){
 }
 
 setTimeout(() => {
-  if (isStandalone()) return;
-  if (browserChoice === null){
+  if (launchMode === null){
     showLaunchChoice();
-  } else if (!sessionStorage.getItem('install_dismissed')){
+  } else if (launchMode === 'browser' && !sessionStorage.getItem('install_dismissed')){
     setTimeout(showInstallBanner, 2500);
   }
+  // Если launchMode === 'app' — ничего не показываем
 }, 800);
 </script>
 </body>
